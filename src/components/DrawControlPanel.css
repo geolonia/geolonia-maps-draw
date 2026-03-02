@@ -155,3 +155,15 @@
   box-shadow: none;
   transform: none;
 }
+
+.draw-control-panel__branding {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity var(--de-transition-normal, 0.25s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.draw-control-panel__branding:hover {
+  opacity: 1;
+}

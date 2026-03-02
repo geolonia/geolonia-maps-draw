@@ -1,45 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
-import maplibregl from 'maplibre-gl'
 import {
   useDrawingEngine,
+  useGeoloniaMap,
   DrawControlPanel,
   VertexContextMenu,
 } from '@geolonia/drawing-engine'
 import '@geolonia/drawing-engine/style.css'
 
 export function App() {
-  const mapContainerRef = useRef<HTMLDivElement>(null)
-  const [map, setMap] = useState<maplibregl.Map | null>(null)
-
-  useEffect(() => {
-    if (!mapContainerRef.current) return
-
-    const container = mapContainerRef.current
-
-    // Geolonia Embed が地図を初期化するのを待つ
-    const observer = new MutationObserver(() => {
-      const mapElement = container.querySelector('.maplibregl-map') as HTMLElement | null
-      if (mapElement) {
-        observer.disconnect()
-        // Geolonia Embed は window 上の geolonia オブジェクト経由で Map インスタンスを公開
-        // load イベントで取得する
-        const checkMap = () => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const geoloniaMap = (mapElement as any).__map as maplibregl.Map | undefined
-          if (geoloniaMap) {
-            setMap(geoloniaMap)
-          } else {
-            setTimeout(checkMap, 100)
-          }
-        }
-        checkMap()
-      }
-    })
-
-    observer.observe(container, { childList: true, subtree: true })
-
-    return () => observer.disconnect()
-  }, [])
+  const { containerRef, map } = useGeoloniaMap({
+    center: [139.767, 35.681],
+    zoom: 14,
+  })
 
   const engine = useDrawingEngine(map)
 
@@ -49,12 +20,9 @@ export function App() {
     <div className="app">
       <div className="app__map-container">
         <div
-          ref={mapContainerRef}
-          className="app__map"
-          data-lat="35.681"
-          data-lng="139.767"
-          data-zoom="14"
+          ref={containerRef}
           data-navigation-control="on"
+          className="app__map"
         />
         {map && (
           <>

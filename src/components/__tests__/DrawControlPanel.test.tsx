@@ -411,7 +411,23 @@ describe('DrawControlPanel', () => {
       const props = makeProps()
       const { container } = render(<DrawControlPanel {...props} />)
       const separators = container.querySelectorAll('.draw-control-panel__separator')
-      expect(separators.length).toBe(2)
+      expect(separators.length).toBe(3)
+    })
+  })
+
+  describe('branding', () => {
+    it('renders Geolonia branding element', () => {
+      const props = makeProps()
+      const { container } = render(<DrawControlPanel {...props} />)
+      const branding = container.querySelector('.draw-control-panel__branding')
+      expect(branding).not.toBeNull()
+    })
+
+    it('branding contains GeoloniaIcon SVG', () => {
+      const props = makeProps()
+      render(<DrawControlPanel {...props} />)
+      const icon = screen.getByRole('img', { name: 'Powered by Geolonia' })
+      expect(icon).not.toBeNull()
     })
   })
 })

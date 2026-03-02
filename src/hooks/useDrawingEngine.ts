@@ -7,6 +7,7 @@ import { useVertexEditing, VERTEX_LAYER_ID } from './useVertexEditing'
 import type { SelectedVertex, VertexContextMenuEvent } from './useVertexEditing'
 import { createPointFeature, createPathFeature, createDraftFeatureCollection, nextFeatureId } from '../lib/geojson-helpers'
 import { parseCSV } from '../lib/csv-helpers'
+import { assertGeolonia } from '../lib/assert-geolonia'
 
 const SOURCE_ID = 'geojson-maker-generated-features'
 const POINT_LAYER_ID = 'geojson-maker-point-layer'
@@ -82,6 +83,7 @@ export function useDrawingEngine(
   map: maplibregl.Map | null,
   options?: DrawingEngineOptions,
 ): DrawingEngineResult {
+  assertGeolonia()
   const emptyFC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] }
   const initialFC = options?.initialFeatures ?? emptyFC
 

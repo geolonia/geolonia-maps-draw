@@ -35,6 +35,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     resolve: {
       alias: {
+        '@geolonia/drawing-engine/style.css': resolve(__dirname, 'src/drawing-engine.css'),
         '@geolonia/drawing-engine': resolve(__dirname, 'src/index.ts'),
       },
     },

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { DrawMode } from '../types'
 import { DrawModeSelector } from './DrawModeSelector'
+import { GeoloniaIcon } from './GeoloniaIcon'
 import { clampPosition } from '../lib/clamp-position'
 import './DrawControlPanel.css'
 
@@ -163,6 +164,10 @@ export function DrawControlPanel({
           <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
         </svg>
       </button>
+      <div className='draw-control-panel__separator' />
+      <div className='draw-control-panel__branding'>
+        <GeoloniaIcon />
+      </div>
     </div>
   )
 }

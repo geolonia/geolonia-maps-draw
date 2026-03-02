@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useDrawingEngine } from '../useDrawingEngine'
+import { GeoloniaNotFoundError } from '../../lib/assert-geolonia'
 
 type MockMap = ReturnType<typeof createMockMap>
 
@@ -1451,6 +1452,16 @@ describe('useDrawingEngine', () => {
       })
 
       expect(result.current.features.features).toHaveLength(1)
+    })
+  })
+
+  describe('Geolonia guard', () => {
+    it('throws GeoloniaNotFoundError when window.geolonia is missing', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).geolonia
+      expect(() => {
+        renderHook(() => useDrawingEngine(null))
+      }).toThrow(GeoloniaNotFoundError)
     })
   })
 
