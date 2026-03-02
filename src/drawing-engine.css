@@ -1,0 +1,14 @@
+@layer drawing-engine {
+  :root {
+    --de-gradient-primary: var(--gradient-primary, linear-gradient(135deg, #1a73e8 0%, #7c3aed 100%));
+    --de-gradient-confirm: var(--gradient-confirm, linear-gradient(135deg, #1a73e8 0%, #6d28d9 50%, #7c3aed 100%));
+    --de-glass-border: var(--glass-border, rgba(255, 255, 255, 0.45));
+    --de-glass-blur-strong: var(--glass-blur-strong, 24px);
+    --de-glow-confirm: var(--glow-confirm, 0 4px 20px rgba(26, 115, 232, 0.35), 0 0 30px rgba(124, 58, 237, 0.2));
+    --de-color-danger: var(--color-danger, #ef4444);
+    --de-color-blue: var(--color-blue, #1a73e8);
+    --de-transition-fast: var(--transition-fast, 0.15s cubic-bezier(0.4, 0, 0.2, 1));
+    --de-transition-normal: var(--transition-normal, 0.25s cubic-bezier(0.4, 0, 0.2, 1));
+    --de-transition-slow: var(--transition-slow, 0.4s cubic-bezier(0.4, 0, 0.2, 1));
+  }
+}

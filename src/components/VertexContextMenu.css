@@ -1,0 +1,46 @@
+.vertex-context-menu {
+  position: fixed;
+  z-index: 100;
+  min-width: 160px;
+  padding: 6px;
+  border-radius: 10px;
+
+  background:
+    linear-gradient(160deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(237, 233, 254, 0.8) 100%);
+  backdrop-filter: blur(var(--de-glass-blur-strong, 24px));
+  -webkit-backdrop-filter: blur(var(--de-glass-blur-strong, 24px));
+  border: 1px solid var(--de-glass-border, rgba(255, 255, 255, 0.45));
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(26, 115, 232, 0.08);
+}
+
+.vertex-context-menu__item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--de-transition-fast, 0.15s cubic-bezier(0.4, 0, 0.2, 1)),
+    color var(--de-transition-fast, 0.15s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.vertex-context-menu__item:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.04));
+  color: var(--de-color-danger, #ef4444);
+}
+
+.vertex-context-menu__item--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  color: #9ca3af;
+}
