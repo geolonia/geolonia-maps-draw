@@ -14,8 +14,6 @@ export function App() {
 
   const engine = useDrawingEngine(map)
 
-  const geojsonText = JSON.stringify(engine.features, null, 2)
-
   return (
     <div className="app">
       <div className="app__map-container">
@@ -48,10 +46,6 @@ export function App() {
             )}
           </>
         )}
-      </div>
-      <div className="app__sidebar">
-        <h2 className="app__sidebar-title">GeoJSON Output</h2>
-        <pre className="app__geojson-output">{geojsonText}</pre>
       </div>
     </div>
   )

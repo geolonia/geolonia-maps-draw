@@ -32,29 +32,3 @@ html, body, #root {
   z-index: 10;
 }
 
-.app__sidebar {
-  width: 360px;
-  border-left: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  background: #f9fafb;
-}
-
-.app__sidebar-title {
-  padding: 16px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.app__geojson-output {
-  flex: 1;
-  padding: 16px;
-  overflow: auto;
-  font-size: 12px;
-  line-height: 1.5;
-  color: #1f2937;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
