@@ -2,6 +2,10 @@
 
 Geolonia Maps (MapLibre GL JS) 向けの GeoJSON 描画エンジン。React hooks とコンポーネントで構成されています。
 
+## Demo
+
+https://geolonia.github.io/geolonia-maps-draw/
+
 ## インストール
 
 ```bash
