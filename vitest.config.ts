@@ -11,7 +11,14 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/**/__tests__/**', 'src/**/index.ts', 'src/types.ts'],
+      exclude: [
+        'src/**/__tests__/**',
+        'src/**/index.ts',
+        'src/types.ts',
+        'src/core/geolonia-types.ts',
+        'src/core/types.ts',
+        'src/plugin/index.ts',
+      ],
       thresholds: {
         statements: 100,
         branches: 100,

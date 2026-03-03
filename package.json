@@ -9,15 +9,26 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./style.css": "./dist/index.css"
+    "./vanilla": {
+      "import": "./dist/vanilla.js",
+      "types": "./dist/vanilla.d.ts"
+    },
+    "./plugin": "./dist/plugin/plugin.iife.js",
+    "./style.css": "./dist/style.css"
   },
   "files": [
     "dist"
   ],
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18",
     "maplibre-gl": ">=4"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
@@ -41,6 +52,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:plugin": "vite build --config vite.config.plugin.ts",
     "lint": "eslint .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
