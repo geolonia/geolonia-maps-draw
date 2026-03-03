@@ -21,11 +21,17 @@ export function registerDrawPlugin(): void {
 
   window.geolonia!.registerPlugin!((map: maplibregl.Map, target: HTMLElement, atts: Record<string, string>) => {
     if (atts.draw !== 'on') return
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((target as any).__drawingEngine) return
 
     const options = parseDataAttributes(atts)
     const engine = new DrawingEngine(map, options)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(target as any).__drawingEngine = engine
-    map.on('remove', () => engine.destroy())
+    map.on('remove', () => {
+      engine.destroy()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(target as any).__drawingEngine = null
+    })
   })
 }

@@ -85,6 +85,13 @@ describe('DrawControlPanelElement', () => {
     expect(resetBtn.getAttribute('aria-label')).toBe('GeoJSONを初期化')
   })
 
+  it('all action buttons have aria-label', () => {
+    const actionButtons = panel.element.querySelectorAll('.draw-control-panel__action-button')
+    actionButtons.forEach((btn) => {
+      expect(btn.getAttribute('aria-label')).toBeTruthy()
+    })
+  })
+
   it('contains branding with Geolonia icon', () => {
     const branding = panel.element.querySelector('.draw-control-panel__branding')
     expect(branding).not.toBeNull()
@@ -223,8 +230,8 @@ describe('DrawControlPanelElement', () => {
       // Position should have changed (exact values depend on drag offset)
       const left = parseInt(panel.element.style.left)
       const top = parseInt(panel.element.style.top)
-      expect(typeof left).toBe('number')
-      expect(typeof top).toBe('number')
+      expect(Number.isFinite(left)).toBe(true)
+      expect(Number.isFinite(top)).toBe(true)
     })
 
     it('mousemove without drag does nothing', () => {

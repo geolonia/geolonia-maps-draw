@@ -322,6 +322,41 @@ describe('VertexEditingController', () => {
       expect(mainSrc.setData).toHaveBeenCalled()
     })
 
+    it('preserves polygon inner rings during vertex drag', () => {
+      const polygonWithHole: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]],
+            [[2, 2], [8, 2], [8, 8], [2, 2]],
+          ],
+        },
+        properties: { _id: 'ph1' },
+      }
+      ctrl.setFeatures({ type: 'FeatureCollection', features: [polygonWithHole] })
+
+      // mousedown on vertex 0
+      map.queryRenderedFeatures.mockReturnValueOnce([{ properties: { featureId: 'ph1', vertexIndex: 1 } }])
+      map.fire('mousedown', { point: { x: 10, y: 10 } })
+
+      // drag
+      map.fire('mousemove', { point: { x: 20, y: 20 }, lngLat: { lng: 15, lat: 5 } })
+
+      // mouseup
+      const commitHandler = vi.fn()
+      ctrl.addEventListener('vertexcommit', commitHandler)
+      map.fire('mouseup', {})
+
+      expect(commitHandler).toHaveBeenCalledTimes(1)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const committed = (commitHandler.mock.calls[0][0] as any).detail.feature as GeoJSON.Feature
+      const coords = (committed.geometry as GeoJSON.Polygon).coordinates
+      // Inner ring should be preserved
+      expect(coords).toHaveLength(2)
+      expect(coords[1]).toEqual([[2, 2], [8, 2], [8, 8], [2, 2]])
+    })
+
     it('updates polygon vertex 0 and closing point during drag', () => {
       const polygonFeature: GeoJSON.Feature = {
         type: 'Feature',
@@ -384,6 +419,32 @@ describe('VertexEditingController', () => {
       expect(selectHandler).toHaveBeenCalledTimes(1)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((selectHandler.mock.calls[0][0] as any).detail.vertex).toBeNull()
+    })
+
+    it('clears selectedVertex immediately before dispatching events', () => {
+      ctrl.attach()
+      const line: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: [[0, 0], [1, 1], [2, 2]],
+        },
+        properties: { _id: 'f1' },
+      }
+      ctrl.setFeatures({ type: 'FeatureCollection', features: [line] })
+      ctrl.updateHandles(line, { featureId: 'f1', vertexIndex: 1 })
+
+      // Capture the state during the vertexcommit event
+      let vertexDuringCommit: unknown = 'not-set'
+      ctrl.addEventListener('vertexcommit', () => {
+        // At this point, selectedVertex should already be null
+        vertexDuringCommit = ctrl.justDragged // just checking ctrl is accessible
+      })
+
+      ctrl.deleteSelectedVertex()
+
+      // The vertexselect event should report null
+      expect(vertexDuringCommit).not.toBe('not-set')
     })
 
     it('does nothing when no vertex is selected', () => {

@@ -17,6 +17,7 @@
     import '@geolonia/drawing-engine/style.css'
 
     const mapEl = document.getElementById('map')
+    if (!mapEl) throw new Error('#map not found')
     const map = new window.geolonia.Map({ container: mapEl, boxZoom: false })
     map.on('load', () => {
       const engine = new DrawingEngine(map, { showControls: true })

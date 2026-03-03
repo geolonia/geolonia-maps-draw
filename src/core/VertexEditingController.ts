@@ -62,7 +62,7 @@ function applyVertexMove(
       if (vertexIndex === 0 && i === geom.coordinates[0].length - 1) return newCoord
       return c
     }) as [number, number][]
-    return { ...feature, geometry: { ...geom, coordinates: [ring] } }
+    return { ...feature, geometry: { ...geom, coordinates: [ring, ...geom.coordinates.slice(1)] } }
   }
   return feature
 }
@@ -142,6 +142,7 @@ export class VertexEditingController extends EventTarget {
     const feature = this.features.features.find((f) => f.properties?._id === sv.featureId)
     if (!feature || !canDeleteVertex(feature)) return
     const updated = applyVertexDelete(feature, sv.vertexIndex)
+    this.selectedVertex = null
     this.dispatchEvent(new CustomEvent('vertexcommit', { detail: { feature: updated } }))
     this.dispatchEvent(new CustomEvent('vertexselect', { detail: { vertex: null } }))
   }

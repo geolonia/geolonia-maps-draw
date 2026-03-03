@@ -26,6 +26,15 @@ describe('assertGeolonia', () => {
     expect(() => assertGeolonia()).toThrow('Geolonia Maps Embed API')
   })
 
+  it('throws GeoloniaNotFoundError when window is undefined (SSR)', () => {
+    const originalWindow = globalThis.window
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (globalThis as any).window
+    expect(() => assertGeolonia()).toThrow(GeoloniaNotFoundError)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(globalThis as any).window = originalWindow
+  })
+
   it('error name is GeoloniaNotFoundError', () => {
     const err = new GeoloniaNotFoundError()
     expect(err.name).toBe('GeoloniaNotFoundError')

@@ -35,6 +35,7 @@ export class DrawModeSelectorElement {
       btn.setAttribute('aria-label', DRAW_MODE_LABELS[mode])
       btn.title = DRAW_MODE_TOOLTIPS[mode]
       btn.className = 'draw-mode-selector__button'
+      btn.setAttribute('aria-pressed', 'false')
       btn.appendChild(DRAW_MODE_ICONS[mode]())
       btn.addEventListener('click', () => {
         this.onChange(mode === this.selectedMode ? null : mode)
@@ -47,9 +48,11 @@ export class DrawModeSelectorElement {
   update(selectedMode: DrawMode | null): void {
     this.selectedMode = selectedMode
     for (const [mode, btn] of this.buttons) {
-      btn.className = mode === selectedMode
+      const isSelected = mode === selectedMode
+      btn.className = isSelected
         ? 'draw-mode-selector__button draw-mode-selector__button--selected'
         : 'draw-mode-selector__button'
+      btn.setAttribute('aria-pressed', String(isSelected))
     }
   }
 }

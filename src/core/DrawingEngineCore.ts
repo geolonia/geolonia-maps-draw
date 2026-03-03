@@ -268,6 +268,10 @@ export class DrawingEngineCore extends EventTarget {
     this.store.set({ type: 'FeatureCollection', features: [] })
     this._draftCoords = []
     this._selectedFeatureIds = new Set()
+    this._selectedVertex = null
+    this._contextMenu = null
+    this._vertexContextMenu = null
+    this._draftContextMenu = null
     this._highlightedPanelFeatureId = null
     this.syncDraftSource()
     this.emit()
@@ -300,6 +304,10 @@ export class DrawingEngineCore extends EventTarget {
       this.store.set({ type: 'FeatureCollection', features: importedFeatures })
       this._draftCoords = []
       this._selectedFeatureIds = new Set()
+      this._selectedVertex = null
+      this._contextMenu = null
+      this._vertexContextMenu = null
+      this._draftContextMenu = null
       this._highlightedPanelFeatureId = null
       this.syncDraftSource()
       this.emit()
@@ -635,7 +643,7 @@ export class DrawingEngineCore extends EventTarget {
 
     if (e.originalEvent.shiftKey) {
       const next = new Set(this._selectedFeatureIds)
-      ids.forEach((id) => next.add(id))
+      for (const id of ids) next.add(id)
       this._selectedFeatureIds = next
     } else {
       this._selectedFeatureIds = ids

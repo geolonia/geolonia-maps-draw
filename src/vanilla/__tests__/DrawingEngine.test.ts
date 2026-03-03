@@ -259,18 +259,66 @@ describe('DrawingEngine', () => {
       expect(handler).toHaveBeenCalled()
     })
 
-    it('dispatches modechange event', () => {
+    it('dispatches modechange event when draw mode changes', () => {
       const handler = vi.fn()
       engine.addEventListener('modechange', handler)
       engine.setDrawMode('polygon')
       expect(handler).toHaveBeenCalled()
     })
 
-    it('dispatches select event', () => {
+    it('does not dispatch modechange when draw mode stays the same', () => {
+      engine.setDrawMode('line')
+      const handler = vi.fn()
+      engine.addEventListener('modechange', handler)
+      // Add a point in line mode — triggers statechange but mode doesn't change
+      map.fire('click', { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 }, originalEvent: { shiftKey: false } })
+      expect(handler).not.toHaveBeenCalled()
+    })
+
+    it('dispatches select event when selection changes', () => {
+      // Add a point first
+      map.fire('click', { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 }, originalEvent: { shiftKey: false } })
+      const id = engine.features.features[0].properties?._id as string
+
       const handler = vi.fn()
       engine.addEventListener('select', handler)
-      engine.setDrawMode('line')
+
+      // Select the feature
+      engine.setDrawMode(null)
+      map.queryRenderedFeatures.mockReturnValueOnce([]).mockReturnValueOnce([{ properties: { _id: id } }])
+      map.fire('click', { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 }, originalEvent: { shiftKey: false } })
+
       expect(handler).toHaveBeenCalled()
+    })
+
+    it('dispatches select when selection changes to different ids of same size', () => {
+      // Add two points
+      map.fire('click', { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 }, originalEvent: { shiftKey: false } })
+      map.fire('click', { point: { x: 1, y: 1 }, lngLat: { lng: 1, lat: 1 }, originalEvent: { shiftKey: false } })
+      const id1 = engine.features.features[0].properties?._id as string
+      const id2 = engine.features.features[1].properties?._id as string
+
+      // Select first feature
+      engine.setDrawMode(null)
+      map.queryRenderedFeatures.mockReturnValueOnce([]).mockReturnValueOnce([{ properties: { _id: id1 } }])
+      map.fire('click', { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 }, originalEvent: { shiftKey: false } })
+
+      const handler = vi.fn()
+      engine.addEventListener('select', handler)
+
+      // Select second feature (same size set but different content)
+      map.queryRenderedFeatures.mockReturnValueOnce([]).mockReturnValueOnce([{ properties: { _id: id2 } }])
+      map.fire('click', { point: { x: 1, y: 1 }, lngLat: { lng: 1, lat: 1 }, originalEvent: { shiftKey: false } })
+
+      expect(handler).toHaveBeenCalled()
+    })
+
+    it('does not dispatch select when selection stays the same', () => {
+      const handler = vi.fn()
+      engine.addEventListener('select', handler)
+      // Changing draw mode clears selection, but it was already empty, so select should not fire
+      engine.setDrawMode('line')
+      expect(handler).not.toHaveBeenCalled()
     })
   })
 
