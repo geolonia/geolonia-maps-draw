@@ -2,6 +2,10 @@
 
 [Geolonia Maps](https://geolonia.com/) 専用の GeoJSON 描画エンジン。React hooks とコンポーネントで構成されています。
 
+## Demo
+
+https://geolonia.github.io/geolonia-maps-draw/
+
 > **注意:** このライブラリは Geolonia Maps Embed API が必須です。`window.geolonia.Map` が存在しない環境では `GeoloniaNotFoundError` がスローされます。
 
 ## インストール
