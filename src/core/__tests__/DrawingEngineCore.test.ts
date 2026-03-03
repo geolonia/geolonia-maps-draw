@@ -452,12 +452,16 @@ describe('DrawingEngineCore', () => {
   })
 
   describe('resetGeoJSON', () => {
-    it('clears all features', () => {
+    it('clears all features and resets all transient state', () => {
       map.fire('click', { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 }, originalEvent: { shiftKey: false } })
       engine.resetGeoJSON()
       expect(engine.features.features).toHaveLength(0)
       expect(engine.selectedFeatureIds.size).toBe(0)
       expect(engine.highlightedPanelFeatureId).toBeNull()
+      expect(engine.selectedVertex).toBeNull()
+      expect(engine.contextMenuEvent).toBeNull()
+      expect(engine.vertexContextMenuEvent).toBeNull()
+      expect(engine.draftContextMenuEvent).toBeNull()
     })
 
     it('clears pending highlight timer', () => {
@@ -499,11 +503,15 @@ describe('DrawingEngineCore', () => {
       properties: { _id: 'imported-1', drawMode: 'point' },
     }]
 
-    it('replaces features in replace mode', () => {
+    it('replaces features in replace mode and resets transient state', () => {
       map.fire('click', { point: { x: 0, y: 0 }, lngLat: { lng: 0, lat: 0 }, originalEvent: { shiftKey: false } })
       engine.importGeoJSON(features, 'replace')
       expect(engine.features.features).toHaveLength(1)
       expect(engine.features.features[0].properties?._id).toBe('imported-1')
+      expect(engine.selectedVertex).toBeNull()
+      expect(engine.contextMenuEvent).toBeNull()
+      expect(engine.vertexContextMenuEvent).toBeNull()
+      expect(engine.draftContextMenuEvent).toBeNull()
     })
 
     it('clears pending highlight timer on replace', () => {

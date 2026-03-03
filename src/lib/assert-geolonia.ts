@@ -23,7 +23,7 @@ export class GeoloniaEmbedRequiredError extends Error {
  * Throws `GeoloniaNotFoundError` if the Geolonia Embed API is not loaded.
  */
 export function assertGeolonia(): void {
-  if (!window.geolonia?.Map) {
+  if (typeof window === 'undefined' || !window.geolonia?.Map) {
     throw new GeoloniaNotFoundError()
   }
 }

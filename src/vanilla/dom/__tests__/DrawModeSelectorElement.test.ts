@@ -50,6 +50,30 @@ describe('DrawModeSelectorElement', () => {
     })
   })
 
+  it('buttons have aria-pressed="false" by default', () => {
+    const selector = new DrawModeSelectorElement(vi.fn())
+    const buttons = selector.element.querySelectorAll('button')
+    buttons.forEach((btn) => {
+      expect(btn.getAttribute('aria-pressed')).toBe('false')
+    })
+  })
+
+  it('update() toggles aria-pressed', () => {
+    const selector = new DrawModeSelectorElement(vi.fn())
+    const buttons = selector.element.querySelectorAll('button')
+
+    selector.update('point')
+    expect(buttons[0].getAttribute('aria-pressed')).toBe('true')
+    expect(buttons[1].getAttribute('aria-pressed')).toBe('false')
+    expect(buttons[2].getAttribute('aria-pressed')).toBe('false')
+    expect(buttons[3].getAttribute('aria-pressed')).toBe('false')
+
+    selector.update(null)
+    buttons.forEach((btn) => {
+      expect(btn.getAttribute('aria-pressed')).toBe('false')
+    })
+  })
+
   it('update() toggles selected class', () => {
     const selector = new DrawModeSelectorElement(vi.fn())
     const buttons = selector.element.querySelectorAll('button')

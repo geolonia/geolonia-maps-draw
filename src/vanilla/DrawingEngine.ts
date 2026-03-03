@@ -16,6 +16,12 @@ import { assertGeolonia } from '../lib/assert-geolonia'
  * - 'modechange' : Emitted when draw mode changes
  * - 'select'     : Emitted when selection changes
  */
+function setsEqual(a: Set<string>, b: Set<string>): boolean {
+  if (a.size !== b.size) return false
+  for (const v of a) if (!b.has(v)) return false
+  return true
+}
+
 export class DrawingEngine extends EventTarget {
   private core: DrawingEngineCore
   private map: maplibregl.Map
@@ -23,6 +29,8 @@ export class DrawingEngine extends EventTarget {
   private vertexMenu: VertexContextMenuElement | null = null
   private rubberBand: RubberBandElement
   private controlsVisible = false
+  private prevDrawMode: DrawMode | null = null
+  private prevSelectedIds: Set<string> = new Set()
 
   constructor(map: maplibregl.Map, options?: DrawingEngineOptions) {
     super()
@@ -40,8 +48,17 @@ export class DrawingEngine extends EventTarget {
     this.core.addEventListener('statechange', () => {
       this.syncUI()
       this.dispatchEvent(new Event('change'))
-      this.dispatchEvent(new Event('modechange'))
-      this.dispatchEvent(new Event('select'))
+
+      if (this.core.drawMode !== this.prevDrawMode) {
+        this.prevDrawMode = this.core.drawMode
+        this.dispatchEvent(new Event('modechange'))
+      }
+
+      const currentIds = this.core.selectedFeatureIds
+      if (!setsEqual(this.prevSelectedIds, currentIds)) {
+        this.prevSelectedIds = new Set(currentIds)
+        this.dispatchEvent(new Event('select'))
+      }
     })
 
     if (options?.showControls !== false) {

@@ -104,7 +104,24 @@ describe('registerDrawPlugin', () => {
     expect((target as any).__drawingEngine).toBeUndefined()
   })
 
-  it('destroys engine on map remove', () => {
+  it('does not create a second DrawingEngine on same target (double init guard)', () => {
+    registerDrawPlugin()
+    const mockMap = createMockMap()
+    const target = document.createElement('div')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    registeredCallback!(mockMap as any, target, { draw: 'on' })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const firstEngine = (target as any).__drawingEngine
+
+    // Call again on same target
+    const mockMap2 = createMockMap()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    registeredCallback!(mockMap2 as any, target, { draw: 'on' })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((target as any).__drawingEngine).toBe(firstEngine)
+  })
+
+  it('destroys engine on map remove and clears reference', () => {
     registerDrawPlugin()
     const mockMap = createMockMap()
     const target = document.createElement('div')
@@ -117,6 +134,8 @@ describe('registerDrawPlugin', () => {
 
     mockMap.fire('remove')
     expect(destroySpy).toHaveBeenCalledTimes(1)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((target as any).__drawingEngine).toBeNull()
   })
 
   it('does nothing when atts is empty', () => {

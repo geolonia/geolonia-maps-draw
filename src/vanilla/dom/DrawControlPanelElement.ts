@@ -136,6 +136,7 @@ export class DrawControlPanelElement {
     const btn = document.createElement('button')
     btn.type = 'button'
     btn.title = title
+    btn.setAttribute('aria-label', title)
     btn.className = 'draw-control-panel__action-button'
     btn.appendChild(icon)
     btn.addEventListener('click', onClick)
