@@ -32,6 +32,13 @@ describe('ResetButton', () => {
     expect(btn).not.toBeNull()
   })
 
+  it('marks SVG as decorative with aria-hidden', () => {
+    const { container } = render(<ResetButton disabled={false} onClick={vi.fn()} />)
+    const svg = container.querySelector('svg')
+    expect(svg?.getAttribute('aria-hidden')).toBe('true')
+    expect(svg?.getAttribute('focusable')).toBe('false')
+  })
+
   describe('confirm dialog behavior', () => {
     it('shows confirm dialog when clicked (showConfirm defaults to true)', () => {
       const onClick = vi.fn()

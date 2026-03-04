@@ -10,6 +10,25 @@ describe('RedoButton', () => {
     expect(btn.tagName).toBe('BUTTON')
   })
 
+  it('has aria-label matching the title', () => {
+    render(<RedoButton disabled={false} onClick={vi.fn()} />)
+    const btn = screen.getByLabelText('やり直す (Ctrl+Shift+Z)')
+    expect(btn).not.toBeNull()
+  })
+
+  it('has aria-label matching custom title', () => {
+    render(<RedoButton disabled={false} onClick={vi.fn()} title="Custom Redo" />)
+    const btn = screen.getByLabelText('Custom Redo')
+    expect(btn).not.toBeNull()
+  })
+
+  it('marks SVG as decorative with aria-hidden', () => {
+    const { container } = render(<RedoButton disabled={false} onClick={vi.fn()} />)
+    const svg = container.querySelector('svg')
+    expect(svg?.getAttribute('aria-hidden')).toBe('true')
+    expect(svg?.getAttribute('focusable')).toBe('false')
+  })
+
   it('calls onClick when clicked', () => {
     const onClick = vi.fn()
     render(<RedoButton disabled={false} onClick={onClick} />)

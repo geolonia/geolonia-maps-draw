@@ -17,9 +17,10 @@ export function UndoButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
+      aria-label={title}
       className={`drawing-engine-button draw-control-panel__action-button${disabled ? ' draw-control-panel__action-button--disabled' : ''}${className ? ` ${className}` : ''}`}
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
         <polyline points="9 14 4 9 9 4" />
         <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
       </svg>

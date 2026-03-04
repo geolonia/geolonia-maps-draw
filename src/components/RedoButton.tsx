@@ -17,9 +17,10 @@ export function RedoButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
+      aria-label={title}
       className={`drawing-engine-button draw-control-panel__action-button${disabled ? ' draw-control-panel__action-button--disabled' : ''}${className ? ` ${className}` : ''}`}
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
         <polyline points="15 14 20 9 15 4" />
         <path d="M4 20v-7a4 4 0 0 1 4-4h12" />
       </svg>
