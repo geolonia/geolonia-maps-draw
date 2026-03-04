@@ -35,7 +35,7 @@ export function createMockMap() {
       if (handlers[event]) handlers[event] = handlers[event].filter((h) => h !== handler)
     }),
     _trigger: (event: string, data: unknown) => {
-      handlers[event]?.forEach((h) => h(data))
+      handlers[event]?.forEach((h) => { h(data) })
     },
     _sources: sources,
     _layers: layers,

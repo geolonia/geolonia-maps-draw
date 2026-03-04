@@ -2,49 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useVertexEditing, VERTEX_SOURCE_ID, VERTEX_LAYER_ID } from '../useVertexEditing'
 import type { SelectedVertex, VertexContextMenuEvent } from '../useVertexEditing'
-
-type MockMap = ReturnType<typeof createMockMap>
-
-function createMockMap() {
-  const handlers: Record<string, ((...args: unknown[]) => void)[]> = {}
-  const sources: Record<string, { setData: ReturnType<typeof vi.fn> }> = {}
-  const layers = new Set<string>()
-  const canvas = document.createElement('canvas')
-
-  const map = {
-    addSource: vi.fn((...args: unknown[]) => {
-      sources[args[0] as string] = { setData: vi.fn() }
-    }),
-    addLayer: vi.fn((opts: { id: string }) => {
-      layers.add(opts.id)
-    }),
-    removeSource: vi.fn((id: string) => {
-      delete sources[id]
-    }),
-    removeLayer: vi.fn((id: string) => {
-      layers.delete(id)
-    }),
-    getSource: vi.fn((id: string) => sources[id]),
-    getLayer: vi.fn((id: string) => (layers.has(id) ? {} : undefined)),
-    getCanvas: vi.fn(() => canvas),
-    queryRenderedFeatures: vi.fn(() => [] as unknown[]),
-    dragPan: { enable: vi.fn(), disable: vi.fn() },
-    on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
-      if (!handlers[event]) handlers[event] = []
-      handlers[event].push(handler)
-    }),
-    off: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
-      if (handlers[event]) handlers[event] = handlers[event].filter((h) => h !== handler)
-    }),
-    _trigger: (event: string, data: unknown) => {
-      handlers[event]?.forEach((h) => h(data))
-    },
-    _sources: sources,
-    _layers: layers,
-    _canvas: canvas,
-  }
-  return map
-}
+import { createMockMap, type MockMap } from '../../__tests__/test-utils'
 
 function makeFeatures(...features: GeoJSON.Feature[]): GeoJSON.FeatureCollection {
   return { type: 'FeatureCollection', features }
