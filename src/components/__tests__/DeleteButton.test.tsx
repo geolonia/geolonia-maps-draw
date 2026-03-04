@@ -10,6 +10,25 @@ describe('DeleteButton', () => {
     expect(btn.tagName).toBe('BUTTON')
   })
 
+  it('has aria-label matching the title', () => {
+    render(<DeleteButton disabled={false} onClick={vi.fn()} />)
+    const btn = screen.getByLabelText('選択した図形を削除')
+    expect(btn).not.toBeNull()
+  })
+
+  it('has aria-label matching custom title', () => {
+    render(<DeleteButton disabled={false} onClick={vi.fn()} title="Custom Delete" />)
+    const btn = screen.getByLabelText('Custom Delete')
+    expect(btn).not.toBeNull()
+  })
+
+  it('marks SVG as decorative with aria-hidden', () => {
+    const { container } = render(<DeleteButton disabled={false} onClick={vi.fn()} />)
+    const svg = container.querySelector('svg')
+    expect(svg?.getAttribute('aria-hidden')).toBe('true')
+    expect(svg?.getAttribute('focusable')).toBe('false')
+  })
+
   it('calls onClick when clicked', () => {
     const onClick = vi.fn()
     render(<DeleteButton disabled={false} onClick={onClick} />)

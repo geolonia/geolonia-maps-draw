@@ -10,6 +10,25 @@ describe('FinalizeButton', () => {
     expect(btn.tagName).toBe('BUTTON')
   })
 
+  it('has aria-label matching the title', () => {
+    render(<FinalizeButton disabled={false} onClick={vi.fn()} />)
+    const btn = screen.getByLabelText('描画を確定')
+    expect(btn).not.toBeNull()
+  })
+
+  it('has aria-label matching custom title', () => {
+    render(<FinalizeButton disabled={false} onClick={vi.fn()} title="Custom Finalize" />)
+    const btn = screen.getByLabelText('Custom Finalize')
+    expect(btn).not.toBeNull()
+  })
+
+  it('marks SVG as decorative with aria-hidden', () => {
+    const { container } = render(<FinalizeButton disabled={false} onClick={vi.fn()} />)
+    const svg = container.querySelector('svg')
+    expect(svg?.getAttribute('aria-hidden')).toBe('true')
+    expect(svg?.getAttribute('focusable')).toBe('false')
+  })
+
   it('calls onClick when clicked', () => {
     const onClick = vi.fn()
     render(<FinalizeButton disabled={false} onClick={onClick} />)

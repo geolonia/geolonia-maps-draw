@@ -10,6 +10,25 @@ describe('UndoButton', () => {
     expect(btn.tagName).toBe('BUTTON')
   })
 
+  it('has aria-label matching the title', () => {
+    render(<UndoButton disabled={false} onClick={vi.fn()} />)
+    const btn = screen.getByLabelText('元に戻す (Ctrl+Z)')
+    expect(btn).not.toBeNull()
+  })
+
+  it('has aria-label matching custom title', () => {
+    render(<UndoButton disabled={false} onClick={vi.fn()} title="Custom Undo" />)
+    const btn = screen.getByLabelText('Custom Undo')
+    expect(btn).not.toBeNull()
+  })
+
+  it('marks SVG as decorative with aria-hidden', () => {
+    const { container } = render(<UndoButton disabled={false} onClick={vi.fn()} />)
+    const svg = container.querySelector('svg')
+    expect(svg?.getAttribute('aria-hidden')).toBe('true')
+    expect(svg?.getAttribute('focusable')).toBe('false')
+  })
+
   it('calls onClick when clicked', () => {
     const onClick = vi.fn()
     render(<UndoButton disabled={false} onClick={onClick} />)
