@@ -45,7 +45,9 @@ type UndoableState = {
   future: GeoJSON.FeatureCollection[]
 }
 
-const emptyFC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] }
+function createEmptyFC(): GeoJSON.FeatureCollection {
+  return { type: 'FeatureCollection', features: [] }
+}
 
 export class DrawingEngine {
   private _map: maplibregl.Map
@@ -67,7 +69,7 @@ export class DrawingEngine {
 
     this._map = options.map
     this._drawMode = options.defaultMode ?? null
-    this._undoState = { past: [], current: emptyFC, future: [] }
+    this._undoState = { past: [], current: createEmptyFC(), future: [] }
 
     this._setupSourcesAndLayers()
 
@@ -110,7 +112,7 @@ export class DrawingEngine {
   }
 
   getFeatures(): GeoJSON.FeatureCollection {
-    return this._undoState.current
+    return structuredClone(this._undoState.current)
   }
 
   undo(): void {
@@ -249,7 +251,7 @@ export class DrawingEngine {
   private _emit<K extends keyof DrawingEngineEventMap>(event: K, data: DrawingEngineEventMap[K]): void {
     const set = this._listeners.get(event)
     if (set) {
-      set.forEach((handler) => handler(data))
+      set.forEach((handler) => { handler(data) })
     }
   }
 
@@ -268,7 +270,7 @@ export class DrawingEngine {
 
     if (map.getSource(SOURCE_ID)) return
 
-    map.addSource(SOURCE_ID, { type: 'geojson', data: emptyFC })
+    map.addSource(SOURCE_ID, { type: 'geojson', data: createEmptyFC() })
 
     map.addLayer({
       id: POLYGON_LAYER_ID,
@@ -299,7 +301,7 @@ export class DrawingEngine {
       paint: { 'circle-radius': 5, 'circle-color': '#1a73e8', 'circle-stroke-color': '#fff', 'circle-stroke-width': 2 },
     })
 
-    map.addSource(DRAFT_SOURCE_ID, { type: 'geojson', data: emptyFC })
+    map.addSource(DRAFT_SOURCE_ID, { type: 'geojson', data: createEmptyFC() })
     map.addLayer({
       id: DRAFT_POLYGON_LAYER_ID,
       type: 'fill',
@@ -322,7 +324,7 @@ export class DrawingEngine {
       paint: { 'circle-radius': 4, 'circle-color': '#e86a4a', 'circle-stroke-color': '#fff', 'circle-stroke-width': 1.5 },
     })
 
-    map.addSource(HIGHLIGHT_SOURCE_ID, { type: 'geojson', data: emptyFC })
+    map.addSource(HIGHLIGHT_SOURCE_ID, { type: 'geojson', data: createEmptyFC() })
     map.addLayer({
       id: HIGHLIGHT_POLYGON_LAYER_ID,
       type: 'line',
@@ -360,7 +362,7 @@ export class DrawingEngine {
     if (isDrawingPath && this._draftCoords.length >= 1) {
       source.setData(createDraftFeatureCollection(this._draftCoords, this._drawMode as PathMode))
     } else {
-      source.setData(emptyFC)
+      source.setData(createEmptyFC())
     }
   }
 

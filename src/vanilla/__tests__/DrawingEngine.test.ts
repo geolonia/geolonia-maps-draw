@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { DrawingEngine } from '../DrawingEngine'
 import { GeoloniaNotFoundError } from '../../lib/assert-geolonia'
 
@@ -33,7 +33,7 @@ function createMockMap() {
       if (handlers[event]) handlers[event] = handlers[event].filter((h) => h !== handler)
     }),
     _trigger: (event: string, data: unknown) => {
-      handlers[event]?.forEach((h) => h(data))
+      handlers[event]?.forEach((h) => { h(data) })
     },
     _sources: sources,
     _layers: layers,
@@ -59,10 +59,6 @@ describe('DrawingEngine', () => {
 
   beforeEach(() => {
     mockMap = createMockMap()
-  })
-
-  afterEach(() => {
-    // Clean up any leftover keyboard listeners
   })
 
   describe('constructor', () => {

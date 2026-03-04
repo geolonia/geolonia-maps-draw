@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           external: ['react', 'react-dom', 'react/jsx-runtime', 'maplibre-gl'],
         },
-        cssFileName: 'style',
+        cssFileName: 'drawing-engine',
       },
     }
   }
