@@ -33,7 +33,7 @@ export { canDeleteVertex, applyVertexDelete } from './lib/vertex-helpers'
 // Geolonia integration
 export { useGeoloniaMap } from './hooks/useGeoloniaMap'
 export type { GeoloniaMapSettings } from './hooks/useGeoloniaMap'
-export { assertGeolonia, GeoloniaNotFoundError } from './lib/assert-geolonia'
+export { assertGeolonia, GeoloniaNotFoundError, GeoloniaEmbedNotDetectedError, hasEmbedScript } from './lib/assert-geolonia'
 export { GeoloniaIcon } from './components/GeoloniaIcon'
 
 // Types

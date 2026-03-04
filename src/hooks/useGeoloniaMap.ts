@@ -6,6 +6,7 @@ declare global {
   interface Window {
     geolonia?: {
       Map: new (options: maplibregl.MapOptions) => maplibregl.Map
+      version?: string
     }
   }
 }
