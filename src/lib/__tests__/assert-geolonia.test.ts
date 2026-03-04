@@ -15,8 +15,8 @@ function addEmbedScript(src = 'https://cdn.geolonia.com/v1/embed?geolonia-api-ke
 }
 
 function removeAllEmbedScripts() {
-  document.querySelectorAll('script[data-testid="embed-test"]').forEach((s) => s.remove())
-  document.querySelectorAll('script[data-testid="geolonia-embed"]').forEach((s) => s.remove())
+  document.querySelectorAll('script[data-testid="embed-test"]').forEach((s) => { s.remove() })
+  document.querySelectorAll('script[data-testid="geolonia-embed"]').forEach((s) => { s.remove() })
 }
 
 describe('GeoloniaEmbedNotDetectedError', () => {

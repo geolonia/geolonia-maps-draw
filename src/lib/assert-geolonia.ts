@@ -1,5 +1,3 @@
-const EMBED_CDN_PATTERN = 'cdn.geolonia.com/v1/embed'
-
 export class GeoloniaEmbedNotDetectedError extends Error {
   constructor() {
     super(
@@ -28,8 +26,15 @@ export class GeoloniaNotFoundError extends Error {
 export function hasEmbedScript(): boolean {
   const scripts = document.querySelectorAll('script[src]')
   for (const script of scripts) {
-    if (script.getAttribute('src')?.includes(EMBED_CDN_PATTERN)) {
-      return true
+    const src = script.getAttribute('src')
+    if (!src) continue
+    try {
+      const url = new URL(src, document.baseURI)
+      if (url.hostname === 'cdn.geolonia.com' && url.pathname === '/v1/embed') {
+        return true
+      }
+    } catch {
+      // ignore invalid URL
     }
   }
   return false
@@ -50,7 +55,7 @@ export function hasEmbedScript(): boolean {
  */
 export function assertGeolonia(): void {
   const embedDetected = hasEmbedScript()
-  const mapExists = !!window.geolonia?.Map
+  const mapExists = typeof window.geolonia?.Map === 'function'
 
   if (mapExists) {
     if (!embedDetected) {
