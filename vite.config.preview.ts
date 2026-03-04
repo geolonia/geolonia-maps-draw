@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
-import { renameSync } from 'fs'
+import { existsSync, renameSync } from 'fs'
 
 export default defineConfig({
   root: 'preview',
@@ -11,16 +11,27 @@ export default defineConfig({
     {
       name: 'replace-api-key',
       transformIndexHtml(html) {
-        const apiKey = process.env.VITE_GEOLONIA_API_KEY || 'YOUR-API-KEY'
-        return html.replace(/%VITE_GEOLONIA_API_KEY%/g, apiKey)
+        const apiKey = process.env.VITE_GEOLONIA_API_KEY
+        if (!apiKey && process.env.CI) {
+          throw new Error('VITE_GEOLONIA_API_KEY is not set in CI environment')
+        }
+        return html.replace(/%VITE_GEOLONIA_API_KEY%/g, apiKey || 'YOUR-API-KEY')
       },
     },
     {
       name: 'rename-home-to-index',
       writeBundle() {
         const outDir = resolve(__dirname, 'dist-preview')
-        renameSync(resolve(outDir, 'index.html'), resolve(outDir, 'react.html'))
-        renameSync(resolve(outDir, 'home.html'), resolve(outDir, 'index.html'))
+        const indexHtml = resolve(outDir, 'index.html')
+        const homeHtml = resolve(outDir, 'home.html')
+        if (!existsSync(indexHtml)) {
+          throw new Error(`Expected file not found: ${indexHtml}`)
+        }
+        if (!existsSync(homeHtml)) {
+          throw new Error(`Expected file not found: ${homeHtml}`)
+        }
+        renameSync(indexHtml, resolve(outDir, 'react.html'))
+        renameSync(homeHtml, resolve(outDir, 'index.html'))
       },
     },
   ],
