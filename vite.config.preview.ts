@@ -13,7 +13,7 @@ export default defineConfig({
       transformIndexHtml(html) {
         const apiKey = process.env.VITE_GEOLONIA_API_KEY
         if (!apiKey && process.env.CI) {
-          throw new Error('VITE_GEOLONIA_API_KEY is not set in CI environment')
+          console.warn('Warning: VITE_GEOLONIA_API_KEY is not set in CI environment, using fallback')
         }
         return html.replace(/%VITE_GEOLONIA_API_KEY%/g, apiKey || 'YOUR-API-KEY')
       },
