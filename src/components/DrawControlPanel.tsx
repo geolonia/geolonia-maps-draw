@@ -2,6 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { DrawMode } from '../types'
 import { DrawModeSelector } from './DrawModeSelector'
 import { GeoloniaIcon } from './GeoloniaIcon'
+import { UndoButton } from './UndoButton'
+import { RedoButton } from './RedoButton'
+import { DeleteButton } from './DeleteButton'
+import { ResetButton } from './ResetButton'
+import { FinalizeButton } from './FinalizeButton'
 import { clampPosition } from '../lib/clamp-position'
 import './DrawControlPanel.css'
 
@@ -102,68 +107,33 @@ export function DrawControlPanel({
       </div>
       <DrawModeSelector selectedMode={drawMode} onChange={onChangeMode} />
       <div className='draw-control-panel__separator' />
-      <button
-        type='button'
-        onClick={onUndo}
+      <UndoButton
         disabled={!canUndo}
-        title='元に戻す (Ctrl+Z)'
-        className={`draw-control-panel__action-button${!canUndo ? ' draw-control-panel__action-button--disabled' : ''}`}
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="9 14 4 9 9 4" />
-          <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
-        </svg>
-      </button>
-      <button
-        type='button'
-        onClick={onRedo}
+        onClick={onUndo}
+      />
+      <RedoButton
         disabled={!canRedo}
-        title='やり直す (Ctrl+Shift+Z)'
-        className={`draw-control-panel__action-button${!canRedo ? ' draw-control-panel__action-button--disabled' : ''}`}
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="15 14 20 9 15 4" />
-          <path d="M4 20v-7a4 4 0 0 1 4-4h12" />
-        </svg>
-      </button>
+        onClick={onRedo}
+      />
       {isDrawingPath && (
-        <button
-          type='button'
-          onClick={onFinalize}
+        <FinalizeButton
           disabled={!canFinalizeDraft}
+          onClick={onFinalize}
           title='ドラフトを確定'
-          className={`draw-control-panel__action-button draw-control-panel__action-button--confirm${canFinalizeDraft ? '' : ' draw-control-panel__action-button--disabled'}`}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </button>
+        />
       )}
       <div className='draw-control-panel__separator' />
-      <button
-        type='button'
-        onClick={onDeleteFeature}
+      <DeleteButton
         disabled={!hasSelectedFeature}
+        onClick={onDeleteFeature}
         title={selectedCount > 1 ? `選択中の ${selectedCount} 件を削除` : '選択した地物を削除'}
-        className={`draw-control-panel__action-button draw-control-panel__action-button--delete${hasSelectedFeature ? '' : ' draw-control-panel__action-button--disabled'}`}
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="3 6 5 6 21 6" />
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-        </svg>
-      </button>
-      <button
-        type='button'
+      />
+      <ResetButton
+        disabled={false}
         onClick={onResetGeoJSON}
         title='GeoJSONを初期化'
-        aria-label='GeoJSONを初期化'
-        className='draw-control-panel__action-button draw-control-panel__action-button--reset'
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="1 4 1 10 7 10" />
-          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-        </svg>
-      </button>
+        showConfirm={false}
+      />
       <div className='draw-control-panel__separator' />
       <div className='draw-control-panel__branding'>
         <GeoloniaIcon />
