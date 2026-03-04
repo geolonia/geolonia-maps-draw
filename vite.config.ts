@@ -17,14 +17,16 @@ export default defineConfig(({ mode }) => {
       ],
       build: {
         lib: {
-          entry: resolve(__dirname, 'src/index.ts'),
+          entry: {
+            index: resolve(__dirname, 'src/index.ts'),
+            vanilla: resolve(__dirname, 'src/vanilla/index.ts'),
+          },
           formats: ['es'],
-          fileName: 'index',
         },
         rollupOptions: {
           external: ['react', 'react-dom', 'react/jsx-runtime', 'maplibre-gl'],
         },
-        cssFileName: 'style',
+        cssFileName: 'drawing-engine',
       },
     }
   }

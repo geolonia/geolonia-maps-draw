@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { undoableReducer } from '../../hooks/useUndoable'
+import { undoableReducer } from '../undoable'
 
 type State = { count: number }
 
