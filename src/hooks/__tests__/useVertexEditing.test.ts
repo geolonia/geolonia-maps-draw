@@ -708,4 +708,145 @@ describe('useVertexEditing', () => {
       expect(() => renderHook(() => useVertexEditing(opts))).not.toThrow()
     })
   })
+
+  describe('edge cases - dragging vertex to same position', () => {
+    it('commits even when vertex is dragged to same position', () => {
+      const line = makeLine('f1', [[0, 0], [1, 1], [2, 2]])
+      const onCommit = vi.fn()
+      const opts = { ...defaultOptions(), features: makeFeatures(line), selectedFeatureId: 'f1', onCommit }
+      renderHook(() => useVertexEditing(opts))
+
+      // mousedown on vertex
+      mockMap.queryRenderedFeatures.mockReturnValueOnce([{ properties: { featureId: 'f1', vertexIndex: 0 } }])
+      mockMap._trigger('mousedown', { point: { x: 10, y: 10 }, lngLat: { lng: 0, lat: 0 } })
+
+      // mousemove to same position (hasMoved becomes true because mousemove fires)
+      mockMap._trigger('mousemove', { point: { x: 10, y: 10 }, lngLat: { lng: 0, lat: 0 } })
+
+      // mouseup
+      mockMap._trigger('mouseup', {})
+
+      // hasMoved is true so onCommit is called, even though position didn't change
+      expect(onCommit).toHaveBeenCalledTimes(1)
+      const committed = onCommit.mock.calls[0][0]
+      expect((committed.geometry as GeoJSON.LineString).coordinates[0]).toEqual([0, 0])
+    })
+  })
+
+  describe('edge cases - feature with many vertices', () => {
+    it('handles line with many vertices', () => {
+      const coords = Array.from({ length: 100 }, (_, i) => [i, i])
+      const line = makeLine('f1', coords)
+      const opts = { ...defaultOptions(), features: makeFeatures(line), selectedFeatureId: 'f1' }
+      renderHook(() => useVertexEditing(opts))
+
+      const source = mockMap._sources[VERTEX_SOURCE_ID]
+      const lastCall = source.setData.mock.calls[source.setData.mock.calls.length - 1][0]
+      expect(lastCall.features).toHaveLength(100)
+    })
+
+    it('handles polygon with many vertices', () => {
+      // 50 vertices + closing point = 51
+      const ring = Array.from({ length: 50 }, (_, i) => [Math.cos(i * 2 * Math.PI / 50), Math.sin(i * 2 * Math.PI / 50)])
+      ring.push(ring[0]) // close the ring
+      const poly = makePolygon('f1', ring)
+      const opts = { ...defaultOptions(), features: makeFeatures(poly), selectedFeatureId: 'f1' }
+      renderHook(() => useVertexEditing(opts))
+
+      const source = mockMap._sources[VERTEX_SOURCE_ID]
+      const lastCall = source.setData.mock.calls[source.setData.mock.calls.length - 1][0]
+      // Should be 50 vertex handles (excluding closing point)
+      expect(lastCall.features).toHaveLength(50)
+    })
+  })
+
+  describe('edge cases - SELECT element key events', () => {
+    it('ignores key events on SELECT elements', () => {
+      const line = makeLine('f1', [[0, 0], [1, 1], [2, 2]])
+      const onCommit = vi.fn()
+      const opts = {
+        ...defaultOptions(),
+        features: makeFeatures(line),
+        selectedVertex: { featureId: 'f1', vertexIndex: 1 },
+        onCommit,
+      }
+      renderHook(() => useVertexEditing(opts))
+
+      const select = document.createElement('select')
+      document.body.appendChild(select)
+      const event = new KeyboardEvent('keydown', { key: 'Delete', cancelable: true })
+      Object.defineProperty(event, 'target', { value: select })
+      window.dispatchEvent(event)
+      document.body.removeChild(select)
+
+      expect(onCommit).not.toHaveBeenCalled()
+    })
+
+    it('ignores key events on contentEditable elements', () => {
+      const line = makeLine('f1', [[0, 0], [1, 1], [2, 2]])
+      const onCommit = vi.fn()
+      const opts = {
+        ...defaultOptions(),
+        features: makeFeatures(line),
+        selectedVertex: { featureId: 'f1', vertexIndex: 1 },
+        onCommit,
+      }
+      renderHook(() => useVertexEditing(opts))
+
+      const div = document.createElement('div')
+      Object.defineProperty(div, 'isContentEditable', { value: true })
+      document.body.appendChild(div)
+      const event = new KeyboardEvent('keydown', { key: 'Delete', cancelable: true })
+      Object.defineProperty(event, 'target', { value: div })
+      window.dispatchEvent(event)
+      document.body.removeChild(div)
+
+      expect(onCommit).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('edge cases - vertex deletion for polygon', () => {
+    it('deletes vertex from polygon with more than 3 vertices', () => {
+      const poly = makePolygon('f1', [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]])
+      const onCommit = vi.fn()
+      const onVertexSelect = vi.fn()
+      const opts = {
+        ...defaultOptions(),
+        features: makeFeatures(poly),
+        selectedFeatureId: 'f1',
+        selectedVertex: { featureId: 'f1', vertexIndex: 1 },
+        onCommit,
+        onVertexSelect,
+      }
+      const { result } = renderHook(() => useVertexEditing(opts))
+
+      act(() => {
+        result.current.deleteSelectedVertex()
+      })
+
+      expect(onCommit).toHaveBeenCalledTimes(1)
+      const committed = onCommit.mock.calls[0][0]
+      const ring = (committed.geometry as GeoJSON.Polygon).coordinates[0]
+      // 3 vertices + closing point after deletion
+      expect(ring).toHaveLength(4)
+      expect(onVertexSelect).toHaveBeenCalledWith(null)
+    })
+
+    it('does not delete vertex from polygon with exactly 3 vertices', () => {
+      const poly = makePolygon('f1', [[0, 0], [1, 0], [0, 1], [0, 0]])
+      const opts = {
+        ...defaultOptions(),
+        features: makeFeatures(poly),
+        selectedFeatureId: 'f1',
+        selectedVertex: { featureId: 'f1', vertexIndex: 0 },
+      }
+      const { result } = renderHook(() => useVertexEditing(opts))
+
+      act(() => {
+        result.current.deleteSelectedVertex()
+      })
+
+      expect(opts.onCommit).not.toHaveBeenCalled()
+    })
+  })
 })

@@ -1487,4 +1487,231 @@ describe('useDrawingEngine', () => {
       Object.defineProperty(navigator, 'userAgent', { value: originalUA, configurable: true })
     })
   })
+
+  describe('edge cases - rapid mode changes', () => {
+    it('handles rapid successive mode changes', () => {
+      const { result } = renderHook(() => useDrawingEngine(getMap()))
+
+      act(() => {
+        result.current.setDrawMode('line')
+      })
+      act(() => {
+        result.current.setDrawMode('polygon')
+      })
+      act(() => {
+        result.current.setDrawMode('point')
+      })
+      act(() => {
+        result.current.setDrawMode('symbol')
+      })
+      act(() => {
+        result.current.setDrawMode(null)
+      })
+
+      expect(result.current.drawMode).toBeNull()
+      expect(result.current.isDrawingPath).toBe(false)
+    })
+
+    it('clears draft coordinates when switching modes during drawing', () => {
+      const { result } = renderHook(() => useDrawingEngine(getMap()))
+
+      // Start drawing a line
+      act(() => {
+        result.current.setDrawMode('line')
+      })
+      act(() => {
+        mockMap._trigger('click', makeMapEvent({ lngLat: { lng: 0, lat: 0 } }))
+      })
+      act(() => {
+        mockMap._trigger('click', makeMapEvent({ lngLat: { lng: 1, lat: 1 } }))
+      })
+
+      expect(result.current.canFinalizeDraft).toBe(true)
+
+      // Switch mode - should clear draft
+      act(() => {
+        result.current.setDrawMode('point')
+      })
+
+      expect(result.current.canFinalizeDraft).toBe(false)
+      expect(result.current.isDrawingPath).toBe(false)
+    })
+  })
+
+  describe('edge cases - concurrent operations', () => {
+    it('clears selection when switching draw mode', () => {
+      const { result } = renderHook(() => useDrawingEngine(getMap()))
+
+      // Add a feature and select it
+      act(() => {
+        mockMap._trigger('click', makeMapEvent())
+      })
+
+      const featureId = result.current.features.features[0].properties?._id
+
+      act(() => {
+        result.current.setSelectedFeatureIds(new Set([featureId]))
+      })
+      expect(result.current.selectedFeatureIds.size).toBe(1)
+
+      // Switch mode - should clear selection
+      act(() => {
+        result.current.setDrawMode('line')
+      })
+
+      expect(result.current.selectedFeatureIds.size).toBe(0)
+    })
+
+    it('handles setFeatures with updater function', () => {
+      const { result } = renderHook(() => useDrawingEngine(getMap()))
+
+      act(() => {
+        mockMap._trigger('click', makeMapEvent())
+      })
+
+      act(() => {
+        result.current.setFeatures((prev) => ({
+          ...prev,
+          features: [...prev.features, {
+            type: 'Feature' as const,
+            geometry: { type: 'Point' as const, coordinates: [1, 1] },
+            properties: { _id: 'manual-1' },
+          }],
+        }))
+      })
+
+      expect(result.current.features.features).toHaveLength(2)
+    })
+
+    it('handles setSelectedFeatureIds with updater function', () => {
+      const { result } = renderHook(() => useDrawingEngine(getMap()))
+
+      act(() => {
+        mockMap._trigger('click', makeMapEvent())
+      })
+      act(() => {
+        mockMap._trigger('click', makeMapEvent({ lngLat: { lng: 1, lat: 1 } }))
+      })
+
+      const id1 = result.current.features.features[0].properties?._id
+      const id2 = result.current.features.features[1].properties?._id
+
+      act(() => {
+        result.current.setSelectedFeatureIds(new Set([id1]))
+      })
+      act(() => {
+        result.current.setSelectedFeatureIds((prev) => {
+          const next = new Set(prev)
+          next.add(id2)
+          return next
+        })
+      })
+
+      expect(result.current.selectedFeatureIds.size).toBe(2)
+    })
+  })
+
+  describe('edge cases - keyboard on editable elements', () => {
+    it('ignores keyboard shortcuts on TEXTAREA elements', () => {
+      const { result } = renderHook(() => useDrawingEngine(getMap()))
+
+      act(() => {
+        mockMap._trigger('click', makeMapEvent())
+      })
+
+      const textarea = document.createElement('textarea')
+      document.body.appendChild(textarea)
+      const event = new KeyboardEvent('keydown', { key: 'z', ctrlKey: true })
+      Object.defineProperty(event, 'target', { value: textarea })
+      act(() => {
+        window.dispatchEvent(event)
+      })
+      document.body.removeChild(textarea)
+
+      expect(result.current.features.features).toHaveLength(1)
+    })
+
+    it('ignores keyboard shortcuts on SELECT elements', () => {
+      const { result } = renderHook(() => useDrawingEngine(getMap()))
+
+      act(() => {
+        mockMap._trigger('click', makeMapEvent())
+      })
+
+      const select = document.createElement('select')
+      document.body.appendChild(select)
+      const event = new KeyboardEvent('keydown', { key: 'z', ctrlKey: true })
+      Object.defineProperty(event, 'target', { value: select })
+      act(() => {
+        window.dispatchEvent(event)
+      })
+      document.body.removeChild(select)
+
+      expect(result.current.features.features).toHaveLength(1)
+    })
+
+    it('ignores keyboard shortcuts on contentEditable elements', () => {
+      const { result } = renderHook(() => useDrawingEngine(getMap()))
+
+      act(() => {
+        mockMap._trigger('click', makeMapEvent())
+      })
+
+      const div = document.createElement('div')
+      Object.defineProperty(div, 'isContentEditable', { value: true })
+      document.body.appendChild(div)
+      const event = new KeyboardEvent('keydown', { key: 'z', ctrlKey: true })
+      Object.defineProperty(event, 'target', { value: div })
+      act(() => {
+        window.dispatchEvent(event)
+      })
+      document.body.removeChild(div)
+
+      expect(result.current.features.features).toHaveLength(1)
+    })
+  })
+
+  describe('edge cases - highlight flash overlap', () => {
+    it('re-clicking a feature resets the highlight timer', () => {
+      const { result } = renderHook(() => useDrawingEngine(getMap()))
+
+      act(() => {
+        mockMap._trigger('click', makeMapEvent())
+      })
+      act(() => {
+        mockMap._trigger('click', makeMapEvent({ lngLat: { lng: 1, lat: 1 } }))
+      })
+
+      const id1 = result.current.features.features[0].properties?._id
+      const id2 = result.current.features.features[1].properties?._id
+
+      // Click first feature
+      act(() => {
+        mockMap.queryRenderedFeatures.mockReturnValueOnce([])
+        mockMap.queryRenderedFeatures.mockReturnValueOnce([{ properties: { _id: id1 } }])
+        mockMap._trigger('click', makeMapEvent())
+      })
+
+      expect(result.current.highlightedPanelFeatureId).toBe(id1)
+
+      // Quickly click second feature before first highlight clears
+      act(() => {
+        vi.advanceTimersByTime(500)
+      })
+      act(() => {
+        mockMap.queryRenderedFeatures.mockReturnValueOnce([])
+        mockMap.queryRenderedFeatures.mockReturnValueOnce([{ properties: { _id: id2 } }])
+        mockMap._trigger('click', makeMapEvent())
+      })
+
+      expect(result.current.highlightedPanelFeatureId).toBe(id2)
+
+      // After full timeout, highlight should clear
+      act(() => {
+        vi.advanceTimersByTime(1600)
+      })
+
+      expect(result.current.highlightedPanelFeatureId).toBeNull()
+    })
+  })
 })
