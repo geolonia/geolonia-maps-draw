@@ -71,4 +71,41 @@ describe('parseCSV', () => {
     const rows = parseCSV(csv)
     expect(rows).toHaveLength(2)
   })
+
+  it('空のCSV（空文字列）でエラーを投げる', () => {
+    expect(() => parseCSV('')).toThrow('CSVにはヘッダーと1行以上のデータが必要です')
+  })
+
+  it('ヘッダーに余分なスペースがあっても検出する', () => {
+    const csv = ' lat , lng \n35.681,139.767'
+    const rows = parseCSV(csv)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].lat).toBe(35.681)
+    expect(rows[0].lng).toBe(139.767)
+  })
+
+  it('lonカラム名を検出する', () => {
+    const csv = 'lat,lon\n35.681,139.767'
+    const rows = parseCSV(csv)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].lng).toBe(139.767)
+  })
+
+  it('カラム数がヘッダーより少ない行でもプロパティが undefined にならない', () => {
+    const csv = 'name,lat,lng\n東京駅,35.681,139.767\n大阪駅,34.693'
+    const rows = parseCSV(csv)
+    // Second row has missing lng, so lat=34.693, lng=NaN -> skipped
+    expect(rows).toHaveLength(1)
+    expect(rows[0].properties.name).toBe('東京駅')
+  })
+
+  it('全行が数値でない場合は空配列を返す', () => {
+    const csv = 'lat,lng\nabc,def\nxyz,uvw'
+    const rows = parseCSV(csv)
+    expect(rows).toHaveLength(0)
+  })
+
+  it('ヘッダーのみ + 空行でエラーを投げる', () => {
+    expect(() => parseCSV('lat,lng\n')).toThrow('CSVにはヘッダーと1行以上のデータが必要です')
+  })
 })
