@@ -55,6 +55,7 @@
     "dev": "vite",
     "build": "vite build && vite build --config vite.config.plugin.ts",
     "build:plugin": "vite build --config vite.config.plugin.ts",
+    "build:preview": "vite build --config vite.config.preview.ts",
     "lint": "eslint .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
