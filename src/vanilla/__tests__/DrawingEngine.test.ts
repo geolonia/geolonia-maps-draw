@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { DrawingEngine } from '../DrawingEngine'
 import { GeoloniaNotFoundError } from '../../lib/assert-geolonia'
 
@@ -61,6 +61,10 @@ describe('DrawingEngine', () => {
     mockMap = createMockMap()
   })
 
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   describe('constructor', () => {
     it('creates engine with default null mode', () => {
       const engine = new DrawingEngine({ map: asMap(mockMap) })
@@ -108,13 +112,17 @@ describe('DrawingEngine', () => {
 
     it('throws GeoloniaNotFoundError when window.geolonia is missing', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (window as any).geolonia
-      expect(() => {
-        new DrawingEngine({ map: asMap(mockMap) })
-      }).toThrow(GeoloniaNotFoundError)
-      // Restore for other tests
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(window as any).geolonia = { Map: vi.fn() }
+      const original = (window as any).geolonia
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (window as any).geolonia
+        expect(() => {
+          new DrawingEngine({ map: asMap(mockMap) })
+        }).toThrow(GeoloniaNotFoundError)
+      } finally {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(window as any).geolonia = original
+      }
     })
   })
 

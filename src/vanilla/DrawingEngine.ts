@@ -120,7 +120,7 @@ export class DrawingEngine {
     this._undoState = undoableReducer(this._undoState, { type: 'UNDO' })
     this._syncMainSource()
     this._syncHighlightLayer()
-    this._emit('featureschange', { features: this._undoState.current })
+    this._emit('featureschange', { features: structuredClone(this._undoState.current) })
   }
 
   redo(): void {
@@ -128,7 +128,7 @@ export class DrawingEngine {
     this._undoState = undoableReducer(this._undoState, { type: 'REDO' })
     this._syncMainSource()
     this._syncHighlightLayer()
-    this._emit('featureschange', { features: this._undoState.current })
+    this._emit('featureschange', { features: structuredClone(this._undoState.current) })
   }
 
   deleteSelectedFeatures(): void {
@@ -262,7 +262,7 @@ export class DrawingEngine {
       this._undoState = undoableReducer(this._undoState, { type: 'SET', payload: newStateOrUpdater })
     }
     this._syncMainSource()
-    this._emit('featureschange', { features: this._undoState.current })
+    this._emit('featureschange', { features: structuredClone(this._undoState.current) })
   }
 
   private _setupSourcesAndLayers(): void {
