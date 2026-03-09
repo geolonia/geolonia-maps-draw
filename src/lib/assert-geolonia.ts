@@ -20,6 +20,16 @@ export class GeoloniaNotFoundError extends Error {
   }
 }
 
+export class GeoloniaEmbedRequiredError extends Error {
+  constructor() {
+    super(
+      '@geolonia/drawing-engine plugin requires the Geolonia Embed API with registerPlugin support. ' +
+      'Please load the script: <script src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=YOUR-API-KEY"></script>',
+    )
+    this.name = 'GeoloniaEmbedRequiredError'
+  }
+}
+
 /**
  * Checks whether an Embed script tag with `cdn.geolonia.com/v1/embed` exists in the document.
  */
@@ -54,6 +64,10 @@ export function hasEmbedScript(): boolean {
  * @throws {GeoloniaNotFoundError} if the Embed script tag exists but Map is not ready.
  */
 export function assertGeolonia(): void {
+  if (typeof window === 'undefined') {
+    throw new GeoloniaNotFoundError()
+  }
+
   const embedDetected = hasEmbedScript()
   const mapExists = typeof window.geolonia?.Map === 'function'
 
@@ -73,4 +87,15 @@ export function assertGeolonia(): void {
     throw new GeoloniaNotFoundError()
   }
   throw new GeoloniaEmbedNotDetectedError()
+}
+
+/**
+ * Asserts that the Geolonia Embed API with `registerPlugin` is available.
+ * Used by the plugin entry point which requires full Embed API support.
+ */
+export function assertGeoloniaEmbed(): void {
+  assertGeolonia()
+  if (typeof window.geolonia?.registerPlugin !== 'function') {
+    throw new GeoloniaEmbedRequiredError()
+  }
 }

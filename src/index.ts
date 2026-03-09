@@ -33,8 +33,12 @@ export { canDeleteVertex, applyVertexDelete } from './lib/vertex-helpers'
 // Geolonia integration
 export { useGeoloniaMap } from './hooks/useGeoloniaMap'
 export type { GeoloniaMapSettings } from './hooks/useGeoloniaMap'
-export { assertGeolonia, GeoloniaNotFoundError, GeoloniaEmbedNotDetectedError, hasEmbedScript } from './lib/assert-geolonia'
+export { assertGeolonia, GeoloniaNotFoundError, GeoloniaEmbedNotDetectedError, hasEmbedScript, assertGeoloniaEmbed, GeoloniaEmbedRequiredError } from './lib/assert-geolonia'
 export { GeoloniaIcon } from './components/GeoloniaIcon'
+
+// Core classes (for advanced usage)
+export { DrawingEngineCore } from './core/DrawingEngineCore'
+export { UndoableStore } from './core/UndoableStore'
 
 // Types
 export type { DrawMode, PathMode } from './types'
