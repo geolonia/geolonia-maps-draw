@@ -22,11 +22,11 @@ export default defineConfig(({ mode }) => {
             vanilla: resolve(__dirname, 'src/vanilla/index.ts'),
           },
           formats: ['es'],
+          cssFileName: 'drawing-engine',
         },
         rollupOptions: {
           external: ['react', 'react-dom', 'react/jsx-runtime', 'maplibre-gl'],
         },
-        cssFileName: 'drawing-engine',
       },
     }
   }
