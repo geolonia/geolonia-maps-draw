@@ -6,15 +6,15 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./vanilla": {
       "import": "./dist/vanilla.js",
       "types": "./dist/vanilla.d.ts"
     },
     "./plugin": "./dist/plugin/plugin.iife.js",
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/drawing-engine.css"
   },
   "files": [
     "dist"
