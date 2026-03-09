@@ -586,6 +586,35 @@ describe('VertexEditingController', () => {
     })
   })
 
+  describe('detach during active drag', () => {
+    const lineFeature: GeoJSON.Feature = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [[0, 0], [1, 1], [2, 2]],
+      },
+      properties: { _id: 'f1' },
+    }
+
+    it('restores dragPan and cursor when detached mid-drag', () => {
+      ctrl.attach()
+      ctrl.setFeatures({ type: 'FeatureCollection', features: [lineFeature] })
+      map.addSource('main-source', {})
+
+      // Start drag
+      map.queryRenderedFeatures.mockReturnValueOnce([{ properties: { featureId: 'f1', vertexIndex: 0 } }])
+      map.fire('mousedown', { point: { x: 10, y: 10 } })
+      expect(map.dragPan.disable).toHaveBeenCalled()
+      expect(map.getCanvas().style.cursor).toBe('grabbing')
+
+      // Detach while dragging
+      ctrl.detach()
+
+      expect(map.dragPan.enable).toHaveBeenCalled()
+      expect(map.getCanvas().style.cursor).toBe('')
+    })
+  })
+
   describe('mouseup without preceding mousedown', () => {
     it('does nothing on mouseup without drag', () => {
       ctrl.attach()

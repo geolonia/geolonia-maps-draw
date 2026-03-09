@@ -227,9 +227,9 @@ export class DrawingEngineCore extends EventTarget {
 
   setSelectedFeatureIds(ids: Set<string> | ((prev: Set<string>) => Set<string>)): void {
     if (typeof ids === 'function') {
-      this._selectedFeatureIds = ids(this._selectedFeatureIds)
+      this._selectedFeatureIds = new Set(ids(new Set(this._selectedFeatureIds)))
     } else {
-      this._selectedFeatureIds = ids
+      this._selectedFeatureIds = new Set(ids)
     }
     this.syncHighlightSource()
     this.syncVertexHandles()
@@ -265,7 +265,6 @@ export class DrawingEngineCore extends EventTarget {
       clearTimeout(this.highlightTimer)
       this.highlightTimer = null
     }
-    this.store.set({ type: 'FeatureCollection', features: [] })
     this._draftCoords = []
     this._selectedFeatureIds = new Set()
     this._selectedVertex = null
@@ -273,6 +272,7 @@ export class DrawingEngineCore extends EventTarget {
     this._vertexContextMenu = null
     this._draftContextMenu = null
     this._highlightedPanelFeatureId = null
+    this.store.set({ type: 'FeatureCollection', features: [] })
     this.syncDraftSource()
     this.emit()
   }
@@ -301,7 +301,6 @@ export class DrawingEngineCore extends EventTarget {
         clearTimeout(this.highlightTimer)
         this.highlightTimer = null
       }
-      this.store.set({ type: 'FeatureCollection', features: importedFeatures })
       this._draftCoords = []
       this._selectedFeatureIds = new Set()
       this._selectedVertex = null
@@ -309,6 +308,7 @@ export class DrawingEngineCore extends EventTarget {
       this._vertexContextMenu = null
       this._draftContextMenu = null
       this._highlightedPanelFeatureId = null
+      this.store.set({ type: 'FeatureCollection', features: importedFeatures })
       this.syncDraftSource()
       this.emit()
     } else {
@@ -343,6 +343,13 @@ export class DrawingEngineCore extends EventTarget {
     this.destroyed = true
 
     const map = this.map
+
+    // Restore dragPan if rubber-band was active
+    if (this.rbDrag) {
+      this.rbDrag = null
+      this._rubberBand = null
+      map.dragPan.enable()
+    }
 
     map.off('click', this.handleClick)
     map.off('contextmenu', this.handleContextMenu)
@@ -469,6 +476,10 @@ export class DrawingEngineCore extends EventTarget {
     const selectedId = this._selectedFeatureIds.size === 1
       ? [...this._selectedFeatureIds][0]
       : null
+    if (!selectedId || (this._selectedVertex && this._selectedVertex.featureId !== selectedId)) {
+      this._selectedVertex = null
+      this._vertexContextMenu = null
+    }
     const feature = selectedId
       ? this.store.current.features.find((f) => f.properties?._id === selectedId) ?? null
       : null
@@ -492,6 +503,7 @@ export class DrawingEngineCore extends EventTarget {
     if (this.vertexCtrl.justDragged) return
 
     this._contextMenu = null
+    this._vertexContextMenu = null
     this._draftContextMenu = null
 
     const map = this.map

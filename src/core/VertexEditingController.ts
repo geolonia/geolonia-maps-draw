@@ -188,6 +188,12 @@ export class VertexEditingController extends EventTarget {
     map.off('contextmenu', this.handleContextMenu)
     window.removeEventListener('keydown', this.handleKeyDown)
 
+    if (this.dragState) {
+      this.dragState = null
+      map.dragPan.enable()
+      map.getCanvas().style.cursor = ''
+    }
+
     if (this.justDraggedTimerId) {
       clearTimeout(this.justDraggedTimerId)
       this.justDraggedTimerId = null

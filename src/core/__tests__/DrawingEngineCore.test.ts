@@ -642,6 +642,40 @@ describe('DrawingEngineCore', () => {
     })
   })
 
+  describe('onClick clears all menus', () => {
+    it('clears vertexContextMenu on left click', () => {
+      // Trigger a vertex context menu via vertex controller event
+      const lineFeature: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+        properties: { _id: 'line1', drawMode: 'line' },
+      }
+      engine.setFeatures({ type: 'FeatureCollection', features: [lineFeature] })
+      engine.setDrawMode(null)
+      engine.setSelectedFeatureIds(new Set(['line1']))
+
+      const vertexHit = { properties: { featureId: 'line1', vertexIndex: 0 } }
+      // Open vertex context menu (need 2 mocks: one for VertexEditingController, one for DrawingEngineCore)
+      map.queryRenderedFeatures
+        .mockReturnValueOnce([vertexHit]) // VertexEditingController.onContextMenu: vertex check
+        .mockReturnValueOnce([vertexHit]) // DrawingEngineCore.onContextMenu: vertex check
+      map.fire('contextmenu', {
+        point: { x: 10, y: 10 },
+        originalEvent: { clientX: 100, clientY: 200, preventDefault: vi.fn() },
+        preventDefault: vi.fn(),
+      })
+      expect(engine.vertexContextMenuEvent).not.toBeNull()
+
+      // Left click should close it
+      map.fire('click', {
+        point: { x: 50, y: 50 },
+        lngLat: { lng: 5, lat: 5 },
+        originalEvent: { shiftKey: false },
+      })
+      expect(engine.vertexContextMenuEvent).toBeNull()
+    })
+  })
+
   describe('rubber band selection', () => {
     beforeEach(() => {
       engine.setDrawMode(null)
@@ -804,6 +838,38 @@ describe('DrawingEngineCore', () => {
       })
       expect(engine.selectedFeatureIds.size).toBe(2)
     })
+
+    it('stores a defensive copy so external mutation does not affect internal state', () => {
+      const externalSet = new Set(['a', 'b'])
+      engine.setSelectedFeatureIds(externalSet)
+      // Mutate the external set
+      externalSet.add('c')
+      // Internal state should not be affected
+      expect(engine.selectedFeatureIds.size).toBe(2)
+      expect(engine.selectedFeatureIds.has('c')).toBe(false)
+    })
+
+    it('stores a defensive copy from updater function return value', () => {
+      engine.setSelectedFeatureIds(new Set(['a']))
+      const returnedSet = new Set(['x', 'y'])
+      engine.setSelectedFeatureIds(() => returnedSet)
+      // Mutate the returned set
+      returnedSet.add('z')
+      // Internal state should not be affected
+      expect(engine.selectedFeatureIds.size).toBe(2)
+      expect(engine.selectedFeatureIds.has('z')).toBe(false)
+    })
+
+    it('passes a defensive copy of prev to updater function', () => {
+      engine.setSelectedFeatureIds(new Set(['a']))
+      engine.setSelectedFeatureIds((prev) => {
+        // Mutating prev should not affect internal state
+        prev.add('mutated')
+        return new Set(['b'])
+      })
+      expect(engine.selectedFeatureIds.has('mutated')).toBe(false)
+      expect(engine.selectedFeatureIds.has('b')).toBe(true)
+    })
   })
 
   describe('destroy', () => {
@@ -822,6 +888,22 @@ describe('DrawingEngineCore', () => {
       engine.destroy()
       // Map handlers should be empty
       expect(map.handlers['click']?.length).toBe(0)
+    })
+
+    it('restores dragPan when destroyed during rubber-band drag', () => {
+      engine.setDrawMode(null)
+      // Start rubber-band drag
+      map.fire('mousedown', { point: { x: 10, y: 10 } })
+      expect(map.dragPan.disable).toHaveBeenCalled()
+
+      // Move to activate rubber-band
+      map.fire('mousemove', { point: { x: 100, y: 100 } })
+      expect(engine.rubberBand).not.toBeNull()
+
+      map.dragPan.enable.mockClear()
+      // Destroy while rubber-band is active
+      engine.destroy()
+      expect(map.dragPan.enable).toHaveBeenCalled()
     })
   })
 
@@ -1129,6 +1211,60 @@ describe('DrawingEngineCore', () => {
       expect((updated.geometry as GeoJSON.LineString).coordinates).toHaveLength(2)
       // The middle vertex [1,1] was removed
       expect((updated.geometry as GeoJSON.LineString).coordinates).toEqual([[0, 0], [2, 2]])
+    })
+  })
+
+  describe('syncVertexHandles invalidates selectedVertex', () => {
+    it('clears selectedVertex when selection changes to different feature', () => {
+      const lineFeature: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+        properties: { _id: 'line1', drawMode: 'line' },
+      }
+      const lineFeature2: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: [[3, 3], [4, 4], [5, 5]] },
+        properties: { _id: 'line2', drawMode: 'line' },
+      }
+      engine.setFeatures({ type: 'FeatureCollection', features: [lineFeature, lineFeature2] })
+      engine.setDrawMode(null)
+      engine.setSelectedFeatureIds(new Set(['line1']))
+
+      // Select a vertex on line1
+      map.queryRenderedFeatures
+        .mockReturnValueOnce([{ properties: { featureId: 'line1', vertexIndex: 1 } }])
+        .mockReturnValueOnce([{ properties: { _id: 'line1' } }])
+      map.fire('mousedown', { point: { x: 10, y: 10 } })
+      map.fire('mouseup', { point: { x: 10, y: 10 }, originalEvent: { shiftKey: false } })
+      expect(engine.selectedVertex).toEqual({ featureId: 'line1', vertexIndex: 1 })
+
+      // Change selection to a different feature
+      engine.setSelectedFeatureIds(new Set(['line2']))
+      // selectedVertex should be invalidated since it belongs to line1
+      expect(engine.selectedVertex).toBeNull()
+    })
+
+    it('clears selectedVertex when selection is cleared', () => {
+      const lineFeature: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+        properties: { _id: 'line1', drawMode: 'line' },
+      }
+      engine.setFeatures({ type: 'FeatureCollection', features: [lineFeature] })
+      engine.setDrawMode(null)
+      engine.setSelectedFeatureIds(new Set(['line1']))
+
+      // Select a vertex
+      map.queryRenderedFeatures
+        .mockReturnValueOnce([{ properties: { featureId: 'line1', vertexIndex: 0 } }])
+        .mockReturnValueOnce([{ properties: { _id: 'line1' } }])
+      map.fire('mousedown', { point: { x: 10, y: 10 } })
+      map.fire('mouseup', { point: { x: 10, y: 10 }, originalEvent: { shiftKey: false } })
+      expect(engine.selectedVertex).not.toBeNull()
+
+      // Clear selection
+      engine.setSelectedFeatureIds(new Set())
+      expect(engine.selectedVertex).toBeNull()
     })
   })
 
