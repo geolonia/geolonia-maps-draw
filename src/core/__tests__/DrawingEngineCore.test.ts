@@ -65,6 +65,7 @@ describe('DrawingEngineCore', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     engine.destroy()
   })
 

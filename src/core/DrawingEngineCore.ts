@@ -141,7 +141,7 @@ export class DrawingEngineCore extends EventTarget {
   }
 
   get selectedFeatureIds(): Set<string> {
-    return this._selectedFeatureIds
+    return new Set(this._selectedFeatureIds)
   }
 
   get isDrawingPath(): boolean {

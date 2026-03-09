@@ -56,6 +56,8 @@ export class DrawControlPanelElement {
     const grip = document.createElement('div')
     grip.className = 'draw-control-panel__grip'
     grip.title = 'ドラッグで移動'
+    grip.setAttribute('role', 'button')
+    grip.setAttribute('aria-label', 'ドラッグで移動')
     grip.appendChild(createGripIcon())
     grip.addEventListener('mousedown', this.onGripMouseDown.bind(this))
     this.element.appendChild(grip)
@@ -121,9 +123,11 @@ export class DrawControlPanelElement {
     this.setDisabled(this.finalizeBtn, !state.canFinalizeDraft)
 
     this.setDisabled(this.deleteBtn, !state.hasSelectedFeature)
-    this.deleteBtn.title = state.selectedCount > 1
+    const deleteTitle = state.selectedCount > 1
       ? `選択中の ${state.selectedCount} 件を削除`
       : '選択した地物を削除'
+    this.deleteBtn.title = deleteTitle
+    this.deleteBtn.setAttribute('aria-label', deleteTitle)
   }
 
   destroy(): void {

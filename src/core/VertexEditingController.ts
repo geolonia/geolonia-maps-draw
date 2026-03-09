@@ -82,6 +82,7 @@ export class VertexEditingController extends EventTarget {
   private features: GeoJSON.FeatureCollection
   private selectedVertex: SelectedVertex | null = null
   private justDraggedFlag = false
+  private justDraggedTimerId: ReturnType<typeof setTimeout> | null = null
   private attached = false
 
   private dragState: {
@@ -187,6 +188,11 @@ export class VertexEditingController extends EventTarget {
     map.off('contextmenu', this.handleContextMenu)
     window.removeEventListener('keydown', this.handleKeyDown)
 
+    if (this.justDraggedTimerId) {
+      clearTimeout(this.justDraggedTimerId)
+      this.justDraggedTimerId = null
+    }
+
     if (map.getLayer(VERTEX_LAYER_ID)) map.removeLayer(VERTEX_LAYER_ID)
     if (map.getSource(VERTEX_SOURCE_ID)) map.removeSource(VERTEX_SOURCE_ID)
   }
@@ -246,7 +252,10 @@ export class VertexEditingController extends EventTarget {
     this.map.getCanvas().style.cursor = ''
 
     this.justDraggedFlag = true
-    setTimeout(() => { this.justDraggedFlag = false }, 50)
+    this.justDraggedTimerId = setTimeout(() => {
+      this.justDraggedFlag = false
+      this.justDraggedTimerId = null
+    }, 50)
 
     if (hasMoved) {
       this.dispatchEvent(new CustomEvent('vertexcommit', { detail: { feature } }))
