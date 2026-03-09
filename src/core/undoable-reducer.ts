@@ -1,16 +1,16 @@
-type UndoableState<T> = {
+export type UndoableState<T> = {
   past: T[]
   current: T
   future: T[]
 }
 
-type UndoableAction<T> =
+export type UndoableAction<T> =
   | { type: 'SET'; payload: T }
   | { type: 'SET_FN'; fn: (prev: T) => T }
   | { type: 'UNDO' }
   | { type: 'REDO' }
 
-const MAX_HISTORY = 50
+export const MAX_HISTORY = 50
 
 export function undoableReducer<T>(state: UndoableState<T>, action: UndoableAction<T>): UndoableState<T> {
   switch (action.type) {

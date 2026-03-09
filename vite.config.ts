@@ -34,10 +34,20 @@ export default defineConfig(({ mode }) => {
   // Dev server for preview
   return {
     root: 'preview',
-    plugins: [react()],
+    plugins: [
+      react(),
+      {
+        name: 'replace-api-key',
+        transformIndexHtml(html) {
+          const apiKey = process.env.VITE_GEOLONIA_API_KEY || 'YOUR-API-KEY'
+          return html.replace(/%VITE_GEOLONIA_API_KEY%/g, apiKey)
+        },
+      },
+    ],
     resolve: {
       alias: {
         '@geolonia/drawing-engine/style.css': resolve(__dirname, 'src/drawing-engine.css'),
+        '@geolonia/drawing-engine/vanilla': resolve(__dirname, 'src/vanilla/index.ts'),
         '@geolonia/drawing-engine': resolve(__dirname, 'src/index.ts'),
       },
     },

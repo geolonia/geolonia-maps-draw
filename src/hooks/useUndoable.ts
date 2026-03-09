@@ -1,19 +1,8 @@
 import { useReducer, useCallback } from 'react'
-import { undoableReducer } from '../lib/undoable'
+import { undoableReducer } from '../core/undoable-reducer'
+import type { UndoableState, UndoableAction } from '../core/undoable-reducer'
 
-export { undoableReducer } from '../lib/undoable'
-
-type UndoableState<T> = {
-  past: T[]
-  current: T
-  future: T[]
-}
-
-type UndoableAction<T> =
-  | { type: 'SET'; payload: T }
-  | { type: 'SET_FN'; fn: (prev: T) => T }
-  | { type: 'UNDO' }
-  | { type: 'REDO' }
+export { undoableReducer } from '../core/undoable-reducer'
 
 export function useUndoable<T>(initialState: T) {
   const [state, dispatch] = useReducer(
