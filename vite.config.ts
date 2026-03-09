@@ -17,9 +17,11 @@ export default defineConfig(({ mode }) => {
       ],
       build: {
         lib: {
-          entry: resolve(__dirname, 'src/index.ts'),
+          entry: {
+            index: resolve(__dirname, 'src/index.ts'),
+            vanilla: resolve(__dirname, 'src/vanilla/index.ts'),
+          },
           formats: ['es'],
-          fileName: 'index',
         },
         rollupOptions: {
           external: ['react', 'react-dom', 'react/jsx-runtime', 'maplibre-gl'],
@@ -45,6 +47,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@geolonia/drawing-engine/style.css': resolve(__dirname, 'src/drawing-engine.css'),
+        '@geolonia/drawing-engine/vanilla': resolve(__dirname, 'src/vanilla/index.ts'),
         '@geolonia/drawing-engine': resolve(__dirname, 'src/index.ts'),
       },
     },

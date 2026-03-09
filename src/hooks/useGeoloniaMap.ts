@@ -1,14 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type maplibregl from 'maplibre-gl'
 import { assertGeolonia } from '../lib/assert-geolonia'
-
-declare global {
-  interface Window {
-    geolonia?: {
-      Map: new (options: maplibregl.MapOptions) => maplibregl.Map
-    }
-  }
-}
+import '../core/geolonia-types'
 
 export type GeoloniaMapSettings = {
   container?: string
