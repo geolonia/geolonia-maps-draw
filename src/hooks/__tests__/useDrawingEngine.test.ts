@@ -1560,60 +1560,29 @@ describe('useDrawingEngine', () => {
   })
 
   describe('edge cases - keyboard on editable elements', () => {
-    it('ignores keyboard shortcuts on TEXTAREA elements', () => {
+    it.each([
+      ['TEXTAREA', () => document.createElement('textarea')],
+      ['SELECT', () => document.createElement('select')],
+      ['contentEditable', () => {
+        const div = document.createElement('div')
+        Object.defineProperty(div, 'isContentEditable', { value: true })
+        return div
+      }],
+    ] as [string, () => HTMLElement][])('ignores keyboard shortcuts when %s is focused', (_name, createElement) => {
       const { result } = renderHook(() => useDrawingEngine(getMap()))
 
       act(() => {
         mockMap._trigger('click', makeMapEvent())
       })
 
-      const textarea = document.createElement('textarea')
-      document.body.appendChild(textarea)
+      const el = createElement()
+      document.body.appendChild(el)
       const event = new KeyboardEvent('keydown', { key: 'z', ctrlKey: true })
-      Object.defineProperty(event, 'target', { value: textarea })
+      Object.defineProperty(event, 'target', { value: el })
       act(() => {
         window.dispatchEvent(event)
       })
-      document.body.removeChild(textarea)
-
-      expect(result.current.features.features).toHaveLength(1)
-    })
-
-    it('ignores keyboard shortcuts on SELECT elements', () => {
-      const { result } = renderHook(() => useDrawingEngine(getMap()))
-
-      act(() => {
-        mockMap._trigger('click', makeMapEvent())
-      })
-
-      const select = document.createElement('select')
-      document.body.appendChild(select)
-      const event = new KeyboardEvent('keydown', { key: 'z', ctrlKey: true })
-      Object.defineProperty(event, 'target', { value: select })
-      act(() => {
-        window.dispatchEvent(event)
-      })
-      document.body.removeChild(select)
-
-      expect(result.current.features.features).toHaveLength(1)
-    })
-
-    it('ignores keyboard shortcuts on contentEditable elements', () => {
-      const { result } = renderHook(() => useDrawingEngine(getMap()))
-
-      act(() => {
-        mockMap._trigger('click', makeMapEvent())
-      })
-
-      const div = document.createElement('div')
-      Object.defineProperty(div, 'isContentEditable', { value: true })
-      document.body.appendChild(div)
-      const event = new KeyboardEvent('keydown', { key: 'z', ctrlKey: true })
-      Object.defineProperty(event, 'target', { value: div })
-      act(() => {
-        window.dispatchEvent(event)
-      })
-      document.body.removeChild(div)
+      document.body.removeChild(el)
 
       expect(result.current.features.features).toHaveLength(1)
     })
