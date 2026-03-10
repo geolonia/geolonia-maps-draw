@@ -19,5 +19,5 @@ afterEach(() => {
 
   // Remove mock Embed script tags
   const scripts = document.querySelectorAll('script[data-testid="geolonia-embed"]')
-  scripts.forEach((s) => s.remove())
+  scripts.forEach((s) => { s.remove() })
 })
