@@ -1,25 +1,17 @@
 export function GeoloniaIcon() {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 136.063 136.063"
       width="24"
       height="24"
-      fill="none"
       aria-label="Powered by Geolonia"
       role="img"
     >
-      <circle cx="12" cy="12" r="11" fill="#2563eb" />
-      <text
-        x="12"
-        y="16.5"
-        textAnchor="middle"
-        fill="#fff"
-        fontSize="14"
-        fontWeight="bold"
-        fontFamily="system-ui, sans-serif"
-      >
-        G
-      </text>
+      <path fill="#EE730D" d="M0,87.165c0,2.598,0,4.797,0,6.378c0,23.483,19.037,42.52,42.52,42.52c1.399,0,3.285,0,5.498,0l48.898-48.897H0z" />
+      <path fill="#EB5C0C" d="M54.029,136.063c13.421,0,32.482,0,39.514,0c23.483,0,42.52-19.036,42.52-42.52c0-1.581,0-3.78,0-6.378h-33.136L54.029,136.063z" />
+      <path fill="#E84130" d="M48.898,0C46.3,0,44.101,0,42.52,0C19.037,0,0,19.037,0,42.52c0,7.186,0,26.939,0,40.394h48.898V0z" />
+      <path fill="#FAC03D" d="M102.927,82.913h33.136c0-13.454,0-33.208,0-40.394c0-23.483-19.037-42.52-42.52-42.52C86.357,0,66.604,0,53.15,0v33.136L102.927,82.913z" />
+      <polygon fill="#F39813" points="53.15,82.913 96.916,82.913 53.15,39.147" />
     </svg>
   )
 }
