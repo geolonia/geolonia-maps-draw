@@ -36,6 +36,14 @@ describe('FinalizeButton', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
+  it('does not call onClick when disabled', () => {
+    const onClick = vi.fn()
+    render(<FinalizeButton disabled onClick={onClick} />)
+    const button = screen.getByTitle('描画を確定')
+    fireEvent.click(button)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
   it('is disabled when disabled prop is true', () => {
     render(<FinalizeButton disabled={true} onClick={vi.fn()} />)
     const btn = screen.getByTitle('描画を確定') as HTMLButtonElement

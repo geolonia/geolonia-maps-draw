@@ -74,6 +74,14 @@ describe('ResetButton', () => {
     })
   })
 
+  it('does not call onClick when disabled', () => {
+    const onClick = vi.fn()
+    render(<ResetButton disabled onClick={onClick} />)
+    const button = screen.getByTitle('すべてリセット')
+    fireEvent.click(button)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
   it('is disabled when disabled prop is true', () => {
     render(<ResetButton disabled={true} onClick={vi.fn()} />)
     const btn = screen.getByTitle('すべてリセット') as HTMLButtonElement

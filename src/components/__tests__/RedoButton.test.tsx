@@ -3,23 +3,19 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { RedoButton } from '../RedoButton'
 
 describe('RedoButton', () => {
-  it('renders correctly with default title', () => {
+  it('renders as a button element', () => {
     render(<RedoButton disabled={false} onClick={vi.fn()} />)
     const btn = screen.getByRole('button', { name: 'やり直す (Ctrl+Shift+Z)' })
-    expect(btn).not.toBeNull()
     expect(btn.tagName).toBe('BUTTON')
   })
 
-  it('has aria-label matching the title', () => {
-    render(<RedoButton disabled={false} onClick={vi.fn()} />)
-    const btn = screen.getByLabelText('やり直す (Ctrl+Shift+Z)')
-    expect(btn).not.toBeNull()
-  })
-
-  it('has aria-label matching custom title', () => {
-    render(<RedoButton disabled={false} onClick={vi.fn()} title="Custom Redo" />)
-    const btn = screen.getByLabelText('Custom Redo')
-    expect(btn).not.toBeNull()
+  it.each([
+    ['やり直す (Ctrl+Shift+Z)', {}],
+    ['Custom Redo', { title: 'Custom Redo' }],
+  ])('has accessible name "%s"', (name, props) => {
+    render(<RedoButton disabled={false} onClick={vi.fn()} {...props} />)
+    expect(screen.getByRole('button', { name })).toBeInTheDocument()
+    expect(screen.getByLabelText(name)).toBeInTheDocument()
   })
 
   it('marks SVG as decorative with aria-hidden', () => {
@@ -34,6 +30,14 @@ describe('RedoButton', () => {
     render(<RedoButton disabled={false} onClick={onClick} />)
     fireEvent.click(screen.getByRole('button', { name: 'やり直す (Ctrl+Shift+Z)' }))
     expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not call onClick when disabled', () => {
+    const onClick = vi.fn()
+    render(<RedoButton disabled onClick={onClick} />)
+    const button = screen.getByRole('button', { name: 'やり直す (Ctrl+Shift+Z)' })
+    fireEvent.click(button)
+    expect(onClick).not.toHaveBeenCalled()
   })
 
   it('is disabled when disabled prop is true', () => {
@@ -56,12 +60,6 @@ describe('RedoButton', () => {
     expect(btn.className).toContain('my-custom-class')
   })
 
-  it('applies custom title', () => {
-    render(<RedoButton disabled={false} onClick={vi.fn()} title="Custom Redo" />)
-    const btn = screen.getByRole('button', { name: 'Custom Redo' })
-    expect(btn).not.toBeNull()
-  })
-
   it('has drawing-engine-button class for standalone usage', () => {
     render(<RedoButton disabled={false} onClick={vi.fn()} />)
     const btn = screen.getByRole('button', { name: 'やり直す (Ctrl+Shift+Z)' })
@@ -77,6 +75,6 @@ describe('RedoButton', () => {
   it('renders an SVG icon', () => {
     const { container } = render(<RedoButton disabled={false} onClick={vi.fn()} />)
     const svg = container.querySelector('svg')
-    expect(svg).not.toBeNull()
+    expect(svg).toBeInTheDocument()
   })
 })
