@@ -3,23 +3,19 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { UndoButton } from '../UndoButton'
 
 describe('UndoButton', () => {
-  it('renders correctly with default title', () => {
+  it('renders as a button element', () => {
     render(<UndoButton disabled={false} onClick={vi.fn()} />)
     const btn = screen.getByRole('button', { name: '元に戻す (Ctrl+Z)' })
-    expect(btn).toBeInTheDocument()
     expect(btn.tagName).toBe('BUTTON')
   })
 
-  it('has aria-label matching the title', () => {
-    render(<UndoButton disabled={false} onClick={vi.fn()} />)
-    const btn = screen.getByLabelText('元に戻す (Ctrl+Z)')
-    expect(btn).toBeInTheDocument()
-  })
-
-  it('has aria-label matching custom title', () => {
-    render(<UndoButton disabled={false} onClick={vi.fn()} title="Custom Undo" />)
-    const btn = screen.getByLabelText('Custom Undo')
-    expect(btn).toBeInTheDocument()
+  it.each([
+    ['元に戻す (Ctrl+Z)', {}],
+    ['Custom Undo', { title: 'Custom Undo' }],
+  ])('has accessible name "%s"', (name, props) => {
+    render(<UndoButton disabled={false} onClick={vi.fn()} {...props} />)
+    expect(screen.getByRole('button', { name })).toBeInTheDocument()
+    expect(screen.getByLabelText(name)).toBeInTheDocument()
   })
 
   it('marks SVG as decorative with aria-hidden', () => {
@@ -62,12 +58,6 @@ describe('UndoButton', () => {
     render(<UndoButton disabled={false} onClick={vi.fn()} className="my-custom-class" />)
     const btn = screen.getByRole('button', { name: '元に戻す (Ctrl+Z)' })
     expect(btn.className).toContain('my-custom-class')
-  })
-
-  it('applies custom title', () => {
-    render(<UndoButton disabled={false} onClick={vi.fn()} title="Custom Undo" />)
-    const btn = screen.getByRole('button', { name: 'Custom Undo' })
-    expect(btn).toBeInTheDocument()
   })
 
   it('has drawing-engine-button class for standalone usage', () => {
