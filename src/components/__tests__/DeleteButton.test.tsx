@@ -3,23 +3,19 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { DeleteButton } from '../DeleteButton'
 
 describe('DeleteButton', () => {
-  it('renders correctly with default title', () => {
+  it('renders as a button element', () => {
     render(<DeleteButton disabled={false} onClick={vi.fn()} />)
     const btn = screen.getByRole('button', { name: '選択した図形を削除' })
-    expect(btn).not.toBeNull()
     expect(btn.tagName).toBe('BUTTON')
   })
 
-  it('has aria-label matching the title', () => {
-    render(<DeleteButton disabled={false} onClick={vi.fn()} />)
-    const btn = screen.getByLabelText('選択した図形を削除')
-    expect(btn).not.toBeNull()
-  })
-
-  it('has aria-label matching custom title', () => {
-    render(<DeleteButton disabled={false} onClick={vi.fn()} title="Custom Delete" />)
-    const btn = screen.getByLabelText('Custom Delete')
-    expect(btn).not.toBeNull()
+  it.each([
+    ['選択した図形を削除', {}],
+    ['Custom Delete', { title: 'Custom Delete' }],
+  ])('has accessible name "%s"', (name, props) => {
+    render(<DeleteButton disabled={false} onClick={vi.fn()} {...props} />)
+    expect(screen.getByRole('button', { name })).toBeInTheDocument()
+    expect(screen.getByLabelText(name)).toBeInTheDocument()
   })
 
   it('marks SVG as decorative with aria-hidden', () => {
@@ -64,12 +60,6 @@ describe('DeleteButton', () => {
     expect(btn.className).toContain('my-custom-class')
   })
 
-  it('applies custom title', () => {
-    render(<DeleteButton disabled={false} onClick={vi.fn()} title="Custom Delete" />)
-    const btn = screen.getByRole('button', { name: 'Custom Delete' })
-    expect(btn).not.toBeNull()
-  })
-
   it('has --delete modifier class', () => {
     render(<DeleteButton disabled={false} onClick={vi.fn()} />)
     const btn = screen.getByRole('button', { name: '選択した図形を削除' })
@@ -85,6 +75,6 @@ describe('DeleteButton', () => {
   it('renders an SVG icon', () => {
     const { container } = render(<DeleteButton disabled={false} onClick={vi.fn()} />)
     const svg = container.querySelector('svg')
-    expect(svg).not.toBeNull()
+    expect(svg).toBeInTheDocument()
   })
 })

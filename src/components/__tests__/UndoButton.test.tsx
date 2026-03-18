@@ -6,20 +6,20 @@ describe('UndoButton', () => {
   it('renders correctly with default title', () => {
     render(<UndoButton disabled={false} onClick={vi.fn()} />)
     const btn = screen.getByRole('button', { name: '元に戻す (Ctrl+Z)' })
-    expect(btn).not.toBeNull()
+    expect(btn).toBeInTheDocument()
     expect(btn.tagName).toBe('BUTTON')
   })
 
   it('has aria-label matching the title', () => {
     render(<UndoButton disabled={false} onClick={vi.fn()} />)
     const btn = screen.getByLabelText('元に戻す (Ctrl+Z)')
-    expect(btn).not.toBeNull()
+    expect(btn).toBeInTheDocument()
   })
 
   it('has aria-label matching custom title', () => {
     render(<UndoButton disabled={false} onClick={vi.fn()} title="Custom Undo" />)
     const btn = screen.getByLabelText('Custom Undo')
-    expect(btn).not.toBeNull()
+    expect(btn).toBeInTheDocument()
   })
 
   it('marks SVG as decorative with aria-hidden', () => {
@@ -67,7 +67,7 @@ describe('UndoButton', () => {
   it('applies custom title', () => {
     render(<UndoButton disabled={false} onClick={vi.fn()} title="Custom Undo" />)
     const btn = screen.getByRole('button', { name: 'Custom Undo' })
-    expect(btn).not.toBeNull()
+    expect(btn).toBeInTheDocument()
   })
 
   it('has drawing-engine-button class for standalone usage', () => {
@@ -85,6 +85,6 @@ describe('UndoButton', () => {
   it('renders an SVG icon', () => {
     const { container } = render(<UndoButton disabled={false} onClick={vi.fn()} />)
     const svg = container.querySelector('svg')
-    expect(svg).not.toBeNull()
+    expect(svg).toBeInTheDocument()
   })
 })

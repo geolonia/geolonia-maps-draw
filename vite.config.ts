@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
         react(),
         dts({
           include: ['src'],
+          exclude: ['src/**/__tests__/**'],
           outDir: 'dist',
           rollupTypes: true,
         }),
