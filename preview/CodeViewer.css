@@ -1,0 +1,118 @@
+/* ── Toggle button ── */
+.code-viewer__toggle {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 20;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fff;
+  color: #333;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.code-viewer__toggle:hover,
+.code-viewer__toggle:focus-visible {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+/* ── Slide-in panel ── */
+.code-viewer__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(480px, 100%);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e2e;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.25);
+  animation: code-viewer-slide-in 0.2s ease-out;
+}
+
+@keyframes code-viewer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ── Header ── */
+.code-viewer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 1rem;
+  background: #181825;
+  border-bottom: 1px solid #313244;
+}
+
+.code-viewer__filename {
+  font-size: 0.8125rem;
+  color: #cdd6f4;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Consolas, monospace;
+}
+
+.code-viewer__close {
+  background: none;
+  border: none;
+  color: #a6adc8;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+.code-viewer__close:hover {
+  color: #f38ba8;
+}
+
+/* ── Code block ── */
+.code-viewer__pre {
+  flex: 1;
+  margin: 0;
+  padding: 1rem;
+  overflow: auto;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+.code-viewer__code {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Consolas, monospace;
+  color: #cdd6f4;
+}
+
+/* ── Syntax highlight tokens (Catppuccin-inspired) ── */
+.hl-keyword {
+  color: #cba6f7;
+}
+
+.hl-string {
+  color: #a6e3a1;
+}
+
+.hl-comment {
+  color: #6c7086;
+  font-style: italic;
+}
+
+.hl-tag {
+  color: #89b4fa;
+}
+
+.hl-number {
+  color: #fab387;
+}
