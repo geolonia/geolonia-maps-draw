@@ -1,5 +1,7 @@
 import { vi } from 'vitest'
 
+let featureIdCounter = 0
+
 /**
  * Creates a consistently mocked MapLibre Map instance for testing.
  */
@@ -67,7 +69,7 @@ export function createMockFeature(
   coordinates: GeoJSON.Position | GeoJSON.Position[] | GeoJSON.Position[][],
   id?: string,
 ): GeoJSON.Feature {
-  const _id = id ?? `test-${Math.random().toString(36).slice(2, 8)}`
+  const _id = id ?? `test-${++featureIdCounter}`
 
   switch (type) {
     case 'Point':
