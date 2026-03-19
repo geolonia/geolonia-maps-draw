@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 interface CodeViewerProps {
   code: string
@@ -15,6 +15,19 @@ export function CodeViewer({ code, fileName }: CodeViewerProps) {
   const toggle = useCallback(() => {
     setIsOpen((prev) => !prev)
   }, [])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen])
 
   return (
     <>

@@ -8,7 +8,6 @@ import '@geolonia/drawing-engine/style.css'
 
 import { CodeViewer } from './CodeViewer'
 import './CodeViewer.css'
-// @ts-expect-error -- Vite ?raw import returns a string at build time
 import appSource from './App.tsx?raw'
 
 export function App() {
@@ -51,7 +50,7 @@ export function App() {
             )}
           </>
         )}
-        <CodeViewer code={appSource as string} fileName="App.tsx" />
+        <CodeViewer code={appSource} fileName="App.tsx" />
       </div>
     </div>
   )

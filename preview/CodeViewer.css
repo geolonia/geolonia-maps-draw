@@ -116,3 +116,9 @@
 .hl-number {
   color: #fab387;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .code-viewer__panel {
+    animation: none;
+  }
+}
