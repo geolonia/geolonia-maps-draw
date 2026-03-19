@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useId } from 'react'
 
 interface CodeViewerProps {
   code: string
@@ -10,6 +10,7 @@ interface CodeViewerProps {
  * Shows/hides with a toggle button.
  */
 export function CodeViewer({ code, fileName }: CodeViewerProps) {
+  const panelId = useId()
   const [isOpen, setIsOpen] = useState(false)
 
   const toggle = useCallback(() => {
@@ -36,14 +37,14 @@ export function CodeViewer({ code, fileName }: CodeViewerProps) {
         className="code-viewer__toggle"
         onClick={toggle}
         aria-expanded={isOpen}
-        aria-controls="code-viewer-panel"
+        aria-controls={panelId}
       >
         {isOpen ? 'Hide Source' : 'View Source'}
       </button>
 
       {isOpen && (
         <div
-          id="code-viewer-panel"
+          id={panelId}
           className="code-viewer__panel"
           role="region"
           aria-label="Source code viewer"
@@ -94,6 +95,10 @@ const KEYWORDS = new Set([
  *
  * This is intentionally simple -- it covers the common patterns found in
  * React demo code without pulling in a heavy highlighting library.
+ *
+ * **Safety**: Input is expected to be trusted, build-time embedded source code
+ * (e.g. Vite `?raw` imports). All output is passed through {@link escapeHtml}
+ * before injection via `dangerouslySetInnerHTML`.
  */
 function highlightTsx(source: string): string {
   // Combined regex that matches tokens in priority order.
