@@ -48,6 +48,7 @@ export default defineConfig({
       input: {
         home: resolve(__dirname, 'preview/home.html'),
         index: resolve(__dirname, 'preview/index.html'),
+        'html-sample': resolve(__dirname, 'preview/html-sample.html'),
       },
     },
   },
