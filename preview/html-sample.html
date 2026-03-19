@@ -244,6 +244,14 @@
       });
 
       copyBtn.addEventListener('click', function() {
+        if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') {
+          var original = copyBtn.textContent;
+          copyBtn.textContent = 'コピー失敗';
+          setTimeout(function() {
+            copyBtn.textContent = original;
+          }, 2000);
+          return;
+        }
         navigator.clipboard.writeText(sampleCode).then(function() {
           var original = copyBtn.textContent;
           copyBtn.textContent = 'コピーしました!';
