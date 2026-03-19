@@ -250,6 +250,13 @@
           setTimeout(function() {
             copyBtn.textContent = original;
           }, 2000);
+        }).catch(function(err) {
+          console.error('クリップボードへのコピーに失敗しました:', err);
+          var original = copyBtn.textContent;
+          copyBtn.textContent = 'コピー失敗';
+          setTimeout(function() {
+            copyBtn.textContent = original;
+          }, 2000);
         });
       });
     })();
