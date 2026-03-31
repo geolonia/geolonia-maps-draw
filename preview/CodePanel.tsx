@@ -12,6 +12,7 @@ interface CodePanelProps {
 
 export function CodePanel({ code, lang, title, description }: CodePanelProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null)
   const [copyLabel, setCopyLabel] = useState('コピー')
 
@@ -24,6 +25,12 @@ export function CodePanel({ code, lang, title, description }: CodePanelProps) {
       .catch(() => { /* keep fallback visible */ })
     return () => { cancelled = true }
   }, [code, lang])
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current)
+    }
+  }, [])
 
   const openDialog = useCallback(() => {
     dialogRef.current?.showModal()
@@ -40,13 +47,14 @@ export function CodePanel({ code, lang, title, description }: CodePanelProps) {
   }, [])
 
   const copyCode = useCallback(async () => {
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current)
     try {
       await navigator.clipboard.writeText(code)
       setCopyLabel('コピーしました!')
     } catch {
       setCopyLabel('コピー失敗')
     }
-    setTimeout(() => setCopyLabel('コピー'), 2000)
+    copyTimerRef.current = setTimeout(() => setCopyLabel('コピー'), 2000)
   }, [code])
 
   return (

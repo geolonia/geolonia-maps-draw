@@ -96,4 +96,41 @@ describe('CodePanel', () => {
     fireEvent.click(screen.getByRole('button', { name: /閉じる/ }))
     expect(dialog).not.toHaveAttribute('open')
   })
+
+  it('closes the dialog when backdrop is clicked', () => {
+    render(<CodePanel {...defaultProps} />)
+    fireEvent.click(screen.getByRole('button', { name: /ソースコードを見る/ }))
+    const dialog = screen.getByRole('dialog', { hidden: true })
+    expect(dialog).toHaveAttribute('open')
+    // Simulate backdrop click (target === dialog element)
+    fireEvent.click(dialog)
+    expect(dialog).not.toHaveAttribute('open')
+  })
+
+  it('copies code to clipboard and shows success label', async () => {
+    const writeTextMock = vi.fn().mockResolvedValue(undefined)
+    Object.assign(navigator, { clipboard: { writeText: writeTextMock } })
+
+    render(<CodePanel {...defaultProps} />)
+    fireEvent.click(screen.getByRole('button', { name: /ソースコードを見る/ }))
+    fireEvent.click(screen.getByRole('button', { name: /コピー/ }))
+
+    await waitFor(() => {
+      expect(writeTextMock).toHaveBeenCalledWith('const x = 1')
+      expect(screen.getByRole('button', { name: /コピーしました/ })).toBeInTheDocument()
+    })
+  })
+
+  it('shows failure label when clipboard write fails', async () => {
+    const writeTextMock = vi.fn().mockRejectedValue(new Error('denied'))
+    Object.assign(navigator, { clipboard: { writeText: writeTextMock } })
+
+    render(<CodePanel {...defaultProps} />)
+    fireEvent.click(screen.getByRole('button', { name: /ソースコードを見る/ }))
+    fireEvent.click(screen.getByRole('button', { name: /コピー/ }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /コピー失敗/ })).toBeInTheDocument()
+    })
+  })
 })

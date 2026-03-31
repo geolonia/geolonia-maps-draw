@@ -12,8 +12,10 @@ export async function getHighlighter(langs: BundledLanguage[]): Promise<Highligh
     highlighterPromise = createHighlighter({
       themes: ['github-dark'],
       langs,
+    }).then((highlighter) => {
+      for (const lang of langs) loadedLangs.add(lang)
+      return highlighter
     })
-    for (const lang of langs) loadedLangs.add(lang)
     return highlighterPromise
   }
 
