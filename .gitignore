@@ -138,3 +138,9 @@ dist-preview
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# CI check marker files
+.unit-passed
+.lint-passed
+.build-passed
+.e2e-passed

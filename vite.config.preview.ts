@@ -38,6 +38,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@geolonia/drawing-engine/style.css': resolve(__dirname, 'src/drawing-engine.css'),
+      '@geolonia/drawing-engine/vanilla': resolve(__dirname, 'src/vanilla/index.ts'),
       '@geolonia/drawing-engine': resolve(__dirname, 'src/index.ts'),
     },
   },
@@ -48,6 +49,7 @@ export default defineConfig({
       input: {
         home: resolve(__dirname, 'preview/home.html'),
         index: resolve(__dirname, 'preview/index.html'),
+        vanilla: resolve(__dirname, 'preview/vanilla.html'),
         'html-sample': resolve(__dirname, 'preview/html-sample.html'),
       },
     },
