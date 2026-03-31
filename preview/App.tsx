@@ -5,6 +5,8 @@ import {
   VertexContextMenu,
 } from '@geolonia/drawing-engine'
 import '@geolonia/drawing-engine/style.css'
+import { CodePanel } from './CodePanel'
+import { reactSampleCode } from './react-sample-code'
 
 export function App() {
   const { containerRef, map } = useGeoloniaMap({
@@ -47,6 +49,13 @@ export function App() {
           </>
         )}
       </div>
+      <a className="app__back-link" href="./">&larr; Demos</a>
+      <CodePanel
+        code={reactSampleCode}
+        lang="tsx"
+        title="React サンプルコード"
+        description="以下のコードをコピーして、React プロジェクトに貼り付けてください。@geolonia/drawing-engine パッケージのインストールが必要です。"
+      />
     </div>
   )
 }

@@ -32,3 +32,23 @@ html, body, #root {
   z-index: 10;
 }
 
+.app__back-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1000;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  color: #374151;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.15s;
+}
+
+.app__back-link:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
