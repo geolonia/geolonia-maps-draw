@@ -51,7 +51,7 @@ function initCodePanel() {
   fallbackPre.textContent = sampleCode
   codeWrapper.appendChild(fallbackPre)
 
-  // Highlight with Shiki
+  // Highlight with Shiki (progressive enhancement — fallback stays if it fails)
   highlightCode(sampleCode, 'html').then((html) => {
     const container = document.createElement('div')
     container.innerHTML = html
@@ -64,7 +64,7 @@ function initCodePanel() {
       shikiPre.style.margin = '0'
       fallbackPre.replaceWith(shikiPre)
     }
-  })
+  }).catch(() => { /* keep fallback visible */ })
 
   viewSourceBtn.addEventListener('click', () => {
     dialog.showModal()

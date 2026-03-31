@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createHighlighter } from 'shiki'
 import type { BundledLanguage } from 'shiki'
+import { highlightCode } from './highlight'
 import './CodePanel.css'
 
 interface CodePanelProps {
@@ -17,16 +17,11 @@ export function CodePanel({ code, lang, title, description }: CodePanelProps) {
 
   useEffect(() => {
     let cancelled = false
-    createHighlighter({
-      themes: ['github-dark'],
-      langs: [lang],
-    }).then((highlighter) => {
-      if (!cancelled) {
-        setHighlightedHtml(
-          highlighter.codeToHtml(code, { lang, theme: 'github-dark' }),
-        )
-      }
-    })
+    highlightCode(code, lang)
+      .then((html) => {
+        if (!cancelled) setHighlightedHtml(html)
+      })
+      .catch(() => { /* keep fallback visible */ })
     return () => { cancelled = true }
   }, [code, lang])
 

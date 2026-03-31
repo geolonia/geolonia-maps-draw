@@ -69,6 +69,11 @@
   color: #111827;
 }
 
+.code-panel__close:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
 .code-panel__body {
   padding: 1rem 1.5rem;
   overflow-y: auto;
@@ -103,6 +108,11 @@
 
 .code-panel__copy:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+.code-panel__copy:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
 }
 
 /* Shiki output styling */

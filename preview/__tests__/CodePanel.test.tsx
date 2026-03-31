@@ -2,16 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { CodePanel } from '../CodePanel'
 
-vi.mock('shiki', () => ({
-  createHighlighter: vi.fn().mockResolvedValue({
-    codeToHtml: vi.fn().mockReturnValue(
-      '<pre class="shiki github-dark"><code><span>const x = 1</span></code></pre>',
-    ),
-  }),
+const highlightCodeMock = vi.fn()
+
+vi.mock('../highlight', () => ({
+  highlightCode: (...args: unknown[]) => highlightCodeMock(...args),
 }))
 
 // jsdom does not implement HTMLDialogElement.showModal / close natively
 beforeEach(() => {
+  highlightCodeMock.mockResolvedValue(
+    '<pre class="shiki github-dark"><code><span>const x = 1</span></code></pre>',
+  )
+
   HTMLDialogElement.prototype.showModal ??= vi.fn(function (this: HTMLDialogElement) {
     this.setAttribute('open', '')
   })
@@ -61,15 +63,23 @@ describe('CodePanel', () => {
   })
 
   it('shows fallback plain code before Shiki loads', () => {
-    // Re-mock with a never-resolving promise to simulate loading state
-    vi.doMock('shiki', () => ({
-      createHighlighter: vi.fn().mockReturnValue(new Promise(() => {})),
-    }))
+    // Replace mock with a never-resolving promise to keep loading state
+    highlightCodeMock.mockReturnValue(new Promise(() => {}))
     render(<CodePanel {...defaultProps} />)
     fireEvent.click(screen.getByRole('button', { name: /ソースコードを見る/ }))
-    // The code element with fallback text should exist
     const codeEl = screen.getByRole('dialog', { hidden: true }).querySelector('code')
     expect(codeEl?.textContent).toBe('const x = 1')
+  })
+
+  it('keeps fallback visible when Shiki fails', async () => {
+    highlightCodeMock.mockRejectedValue(new Error('load failed'))
+    render(<CodePanel {...defaultProps} />)
+    fireEvent.click(screen.getByRole('button', { name: /ソースコードを見る/ }))
+    // Wait for the rejected promise to settle
+    await waitFor(() => {
+      const codeEl = screen.getByRole('dialog', { hidden: true }).querySelector('code')
+      expect(codeEl?.textContent).toBe('const x = 1')
+    })
   })
 
   it('has a copy button', () => {
