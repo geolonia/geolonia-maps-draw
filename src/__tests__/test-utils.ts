@@ -9,6 +9,7 @@ export function createMockMap() {
   const handlers: Record<string, ((...args: unknown[]) => void)[]> = {}
   const sources: Record<string, { setData: ReturnType<typeof vi.fn> }> = {}
   const layers = new Set<string>()
+  const images = new Set<string>()
   const canvas = document.createElement('canvas')
 
   const map = {
@@ -27,6 +28,9 @@ export function createMockMap() {
     getSource: vi.fn((id: string) => sources[id]),
     getLayer: vi.fn((id: string) => (layers.has(id) ? {} : undefined)),
     getCanvas: vi.fn(() => canvas),
+    hasImage: vi.fn((id: string) => images.has(id)),
+    addImage: vi.fn((id: string) => { images.add(id) }),
+    removeImage: vi.fn((id: string) => { images.delete(id) }),
     queryRenderedFeatures: vi.fn(() => [] as unknown[]),
     dragPan: { enable: vi.fn(), disable: vi.fn() },
     on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {

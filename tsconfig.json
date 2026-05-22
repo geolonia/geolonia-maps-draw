@@ -13,7 +13,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "declaration": true,
-    "declarationDir": "dist"
+    "declarationDir": "dist",
+    "types": ["vite/client"]
   },
   "include": ["src", "preview"],
   "references": [{ "path": "./tsconfig.node.json" }]
