@@ -2,13 +2,17 @@ import type maplibregl from 'maplibre-gl'
 import '../core/geolonia-types'
 import { assertGeoloniaEmbed } from '../lib/assert-geolonia'
 import { DrawingEngine } from '../vanilla/DrawingEngine'
+import { resolveAppearance } from '../lib/appearance'
 
 /**
  * Parse `data-*` attributes from the Embed target element into DrawingEngine options.
  */
-function parseDataAttributes(atts: Record<string, string>) {
+export function parseDataAttributes(atts: Record<string, string>) {
   return {
     showControls: atts.draw === 'on',
+    // data-draw-appearance。Embed が渡すキー名の揺れ（dataset 形式 / ハイフン形式）
+    // の両方を受ける。未知の値は既定値に落とす。
+    appearance: resolveAppearance(atts.drawAppearance ?? atts['draw-appearance']),
   }
 }
 

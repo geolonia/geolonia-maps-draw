@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { DrawMode } from '../types'
+import type { Appearance, DrawMode } from '../types'
 import { DrawModeSelector } from './DrawModeSelector'
 import { GeoloniaIcon } from './GeoloniaIcon'
 import { UndoButton } from './UndoButton'
@@ -8,10 +8,13 @@ import { DeleteButton } from './DeleteButton'
 import { ResetButton } from './ResetButton'
 import { FinalizeButton } from './FinalizeButton'
 import { clampPosition } from '../lib/clamp-position'
+import { DEFAULT_APPEARANCE } from '../lib/appearance'
 import './DrawControlPanel.css'
 
 export type DrawControlPanelProps = {
   drawMode: DrawMode | null
+  /** コントロールの外観。既定は 'light'。 */
+  appearance?: Appearance
   isDrawingPath: boolean
   canFinalizeDraft: boolean
   hasSelectedFeature: boolean
@@ -30,6 +33,7 @@ const INITIAL_POSITION = { x: 10, y: 54 }
 
 export function DrawControlPanel({
   drawMode,
+  appearance = DEFAULT_APPEARANCE,
   isDrawingPath,
   canFinalizeDraft,
   hasSelectedFeature,
@@ -89,6 +93,7 @@ export function DrawControlPanel({
     <div
       ref={panelRef}
       className='draw-control-panel'
+      data-de-appearance={appearance}
       style={{ left: position.x, top: position.y }}
     >
       <div

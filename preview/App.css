@@ -32,3 +32,47 @@ html, body, #root {
   z-index: 10;
 }
 
+
+/* 外観切り替え（プレビュー専用。ライブラリの配布物には含まれない） */
+.app__appearance-switcher {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid #d6d9de;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(27, 42, 74, 0.1);
+  font-family: "Noto Sans JP", "Hiragino Sans", sans-serif;
+  font-size: 13px;
+}
+
+.app__appearance-label {
+  color: #5a5a5a;
+  margin-right: 4px;
+}
+
+.app__appearance-button {
+  padding: 4px 8px;
+  border: 1px solid #d6d9de;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1a1a1a;
+  font: inherit;
+  cursor: pointer;
+}
+
+.app__appearance-button--active {
+  background: #1e4fb8;
+  border-color: #1e4fb8;
+  color: #ffffff;
+}
+
+.app__appearance-button:focus-visible {
+  outline: 2px solid #1e4fb8;
+  outline-offset: 2px;
+}

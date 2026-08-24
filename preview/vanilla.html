@@ -20,7 +20,19 @@
     if (!mapEl) throw new Error('#map not found')
     const map = new window.geolonia.Map({ container: mapEl, boxZoom: false })
     map.on('load', () => {
-      const engine = new DrawingEngine(map, { showControls: true })
+      const engine = new DrawingEngine(map, { showControls: true, appearance: 'light' })
+
+      // 外観切り替え（プレビュー専用）
+      const switcher = document.createElement('div')
+      switcher.style.cssText = 'position:absolute;top:10px;right:10px;z-index:3;display:flex;gap:4px;padding:6px 8px;border:1px solid #d6d9de;border-radius:10px;background:#fff;font:13px "Noto Sans JP",sans-serif'
+      for (const value of ['light', 'dark', 'glass', 'auto']) {
+        const btn = document.createElement('button')
+        btn.textContent = value
+        btn.style.cssText = 'padding:4px 8px;border:1px solid #d6d9de;border-radius:6px;background:#fff;cursor:pointer;font:inherit'
+        btn.addEventListener('click', () => engine.setAppearance(value))
+        switcher.appendChild(btn)
+      }
+      document.body.appendChild(switcher)
       engine.addEventListener('change', () => {
         console.log('Features:', JSON.stringify(engine.features, null, 2))
       })

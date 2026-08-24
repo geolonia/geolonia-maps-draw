@@ -1,16 +1,144 @@
 @layer drawing-engine {
-  /* 参照先の外部トークン名は @geolonia/design-tokens の名前と一致していない。
-     対応表と移行先は docs/design-tokens.md を参照する。 */
+  /* 幾何・時間・書体は外観に依存しない共通値。
+     色と質感のみ外観ごとに差し替える。
+     外部トークン名は @geolonia/design-tokens のもの。読み込まれていない場合は
+     フォールバックの既定値が使われる。対応表は docs/design-tokens.md を参照する。 */
   :root {
-    --de-gradient-primary: var(--gradient-primary, linear-gradient(135deg, #1a73e8 0%, #7c3aed 100%));
-    --de-gradient-confirm: var(--gradient-confirm, linear-gradient(135deg, #1a73e8 0%, #6d28d9 50%, #7c3aed 100%));
-    --de-glass-border: var(--glass-border, rgba(255, 255, 255, 0.45));
-    --de-glass-blur-strong: var(--glass-blur-strong, 24px);
-    --de-glow-confirm: var(--glow-confirm, 0 4px 20px rgba(26, 115, 232, 0.35), 0 0 30px rgba(124, 58, 237, 0.2));
-    --de-color-danger: var(--color-danger, #ef4444);
-    --de-color-blue: var(--color-blue, #1a73e8);
+    --de-font-family: var(--font-family-base, "Noto Sans JP", "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic", sans-serif);
+    --de-font-size-body: var(--font-size-body, 16px);
+    --de-font-size-caption: var(--font-size-caption, 13px);
+    --de-font-weight-bold: var(--font-weight-bold, 500);
+
+    --de-space-1: var(--space-1, 4px);
+    --de-space-2: var(--space-2, 8px);
+    --de-space-4: var(--space-4, 16px);
+
+    --de-radius-button: var(--radius-button, 6px);
+    --de-radius-control: var(--radius-control, 6px);
+    --de-radius-card: var(--radius-card, 10px);
+
+    --de-icon-size: 24px;
+    --de-control-padding: var(--de-space-2);
+    --de-panel-padding: var(--de-space-2);
+    --de-panel-gap: var(--de-space-2);
+    --de-selector-gap: var(--de-space-1);
+
     --de-transition-fast: var(--transition-fast, 0.15s cubic-bezier(0.4, 0, 0.2, 1));
     --de-transition-normal: var(--transition-normal, 0.25s cubic-bezier(0.4, 0, 0.2, 1));
     --de-transition-slow: var(--transition-slow, 0.4s cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  /* === 外観: light（既定） ===
+     属性が付いていない要素にも適用されるよう :root にも同じ値を置く。
+     パーツを DrawControlPanel の外に単独配置した場合の既定になる。 */
+  :root,
+  [data-de-appearance='light'],
+  [data-de-appearance='auto'] {
+    --de-color-background: var(--color-background, #ffffff);
+    --de-color-surface: var(--color-surface, #f3f4f6);
+    --de-color-text: var(--color-text-primary, #1a1a1a);
+    --de-color-text-secondary: var(--color-text-secondary, #5a5a5a);
+    --de-color-border: var(--color-border, #d6d9de);
+    --de-color-primary: var(--color-action-primary, #1e4fb8);
+    --de-color-primary-hover: var(--color-action-primary-hover, #163e86);
+    --de-color-accent: var(--color-action-accent, #e85a19);
+    --de-color-danger: var(--color-status-danger, #c0271e);
+
+    --de-panel-background: var(--de-color-background);
+    --de-panel-border-color: var(--de-color-border);
+    --de-panel-radius: var(--de-radius-card);
+    --de-panel-shadow: var(--shadow-card, 0 1px 3px rgba(27, 42, 74, 0.1));
+    --de-panel-shadow-hover: var(--shadow-card-hover, 0 4px 12px rgba(27, 42, 74, 0.12));
+
+    --de-button-background: var(--de-color-background);
+    --de-button-background-hover: var(--de-color-surface);
+    --de-button-selected-background: var(--de-color-primary);
+    --de-button-selected-color: var(--de-color-background);
+    --de-confirm-background: var(--de-color-primary);
+    --de-confirm-color: var(--de-color-background);
+  }
+
+  /* === 外観: dark ===
+     デザインシステムにダークテーマは存在しないため、ここで定義する。
+     各値のコントラスト実測値は docs/design-tokens.md の2節に記載。
+     明るくする処理は color-mix で行い、ブランド軸の切り替えに追従させる。 */
+  [data-de-appearance='dark'] {
+    --de-color-background: var(--color-structure-navy, #1b2a4a);
+    --de-color-surface: color-mix(in srgb, var(--color-background, #ffffff) 12%, var(--color-structure-navy, #1b2a4a));
+    --de-color-text: var(--color-background, #ffffff);
+    --de-color-text-secondary: #b8bec9;
+    --de-color-border: rgba(255, 255, 255, 0.24);
+    --de-color-primary: color-mix(in srgb, var(--color-background, #ffffff) 20%, var(--color-action-primary, #1e4fb8));
+    --de-color-primary-hover: color-mix(in srgb, var(--color-background, #ffffff) 32%, var(--color-action-primary, #1e4fb8));
+    --de-color-accent: var(--color-action-accent, #e85a19);
+    --de-color-danger: color-mix(in srgb, var(--color-background, #ffffff) 30%, var(--color-status-danger, #c0271e));
+
+    --de-panel-background: var(--de-color-background);
+    --de-panel-border-color: var(--de-color-border);
+    --de-panel-radius: var(--de-radius-card);
+    --de-panel-shadow: var(--shadow-modal, 0 8px 24px rgba(27, 42, 74, 0.16));
+    --de-panel-shadow-hover: var(--shadow-modal, 0 8px 24px rgba(27, 42, 74, 0.16));
+
+    --de-button-background: color-mix(in srgb, var(--color-background, #ffffff) 6%, var(--color-structure-navy, #1b2a4a));
+    --de-button-background-hover: var(--de-color-surface);
+    --de-button-selected-background: var(--de-color-primary);
+    --de-button-selected-color: var(--color-background, #ffffff);
+    --de-confirm-background: var(--de-color-primary);
+    --de-confirm-color: var(--color-background, #ffffff);
+  }
+
+  /* auto は prefers-color-scheme に追従する。glass は明示指定のときのみ使う。 */
+  @media (prefers-color-scheme: dark) {
+    [data-de-appearance='auto'] {
+      --de-color-background: var(--color-structure-navy, #1b2a4a);
+      --de-color-surface: color-mix(in srgb, var(--color-background, #ffffff) 12%, var(--color-structure-navy, #1b2a4a));
+      --de-color-text: var(--color-background, #ffffff);
+      --de-color-text-secondary: #b8bec9;
+      --de-color-border: rgba(255, 255, 255, 0.24);
+      --de-color-primary: color-mix(in srgb, var(--color-background, #ffffff) 20%, var(--color-action-primary, #1e4fb8));
+      --de-color-primary-hover: color-mix(in srgb, var(--color-background, #ffffff) 32%, var(--color-action-primary, #1e4fb8));
+      --de-color-danger: color-mix(in srgb, var(--color-background, #ffffff) 30%, var(--color-status-danger, #c0271e));
+
+      --de-panel-shadow: var(--shadow-modal, 0 8px 24px rgba(27, 42, 74, 0.16));
+      --de-panel-shadow-hover: var(--shadow-modal, 0 8px 24px rgba(27, 42, 74, 0.16));
+      --de-button-background: color-mix(in srgb, var(--color-background, #ffffff) 6%, var(--color-structure-navy, #1b2a4a));
+      --de-button-selected-color: var(--color-background, #ffffff);
+      --de-confirm-color: var(--color-background, #ffffff);
+    }
+  }
+
+  /* === 外観: glass ===
+     色は light を継承し、面の質感（グラデーション・ぼかし・発光）のみ上書きする。
+     半透明の面を地図タイルに重ねるため、コントラストは地図の内容で変わる。
+     この外観は AA を保証しない（docs/design-tokens.md の2節）。
+     面の不透明度はここに書かれた値を下限として扱い、これより透明にしない。 */
+  [data-de-appearance='glass'] {
+    --de-glass-blur: 24px;
+    --de-glass-surface-opacity: 0.85;
+
+    --de-panel-background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(237, 233, 254, 0.65) 50%,
+      rgba(219, 234, 254, 0.7) 100%
+    );
+    --de-panel-border-color: rgba(255, 255, 255, 0.45);
+    --de-panel-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      0 2px 8px rgba(30, 79, 184, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    --de-panel-shadow-hover:
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 0 20px rgba(30, 79, 184, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    --de-panel-ring-background: linear-gradient(
+      160deg,
+      rgba(30, 79, 184, 0.3) 0%,
+      rgba(232, 90, 25, 0.2) 50%,
+      rgba(255, 255, 255, 0.4) 100%
+    );
+
+    --de-button-background: rgba(255, 255, 255, 0.85);
+    --de-button-background-hover: rgba(255, 255, 255, 0.95);
   }
 }
