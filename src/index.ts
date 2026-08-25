@@ -51,4 +51,5 @@ export { DrawingEngineCore } from './core/DrawingEngineCore'
 export { UndoableStore } from './core/UndoableStore'
 
 // Types
-export type { DrawMode, PathMode } from './types'
+export type { Appearance, DrawMode, PathMode } from './types'
+export { APPEARANCES, DEFAULT_APPEARANCE, resolveAppearance } from './lib/appearance'

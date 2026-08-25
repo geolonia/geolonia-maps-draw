@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import type maplibregl from 'maplibre-gl'
-import type { DrawMode, PathMode } from '../types'
+import type { Appearance, DrawMode, PathMode } from '../types'
 import type { DrawControlPanelProps } from '../components/DrawControlPanel'
 import { useUndoable } from './useUndoable'
 import { useVertexEditing, VERTEX_LAYER_ID } from './useVertexEditing'
@@ -8,6 +8,7 @@ import type { SelectedVertex, VertexContextMenuEvent } from './useVertexEditing'
 import { createPointFeature, createPathFeature, createDraftFeatureCollection, nextFeatureId } from '../lib/geojson-helpers'
 import { parseCSV } from '../lib/csv-helpers'
 import { assertGeolonia } from '../lib/assert-geolonia'
+import { resolveAppearance } from '../lib/appearance'
 
 const SOURCE_ID = 'geojson-maker-generated-features'
 const POINT_LAYER_ID = 'geojson-maker-point-layer'
@@ -28,6 +29,8 @@ const HIGHLIGHT_DURATION_MS = 1500
 
 export type DrawingEngineOptions = {
   initialFeatures?: GeoJSON.FeatureCollection
+  /** コントロールの外観。既定は 'light'。 */
+  appearance?: Appearance
 }
 
 export type ContextMenuEvent = {
@@ -544,6 +547,7 @@ export function useDrawingEngine(
 
   const controlPanelProps: DrawControlPanelProps = {
     drawMode,
+    appearance: resolveAppearance(options?.appearance),
     isDrawingPath,
     canFinalizeDraft,
     hasSelectedFeature: selectedFeatureIds.size > 0,

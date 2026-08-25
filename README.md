@@ -77,14 +77,70 @@ function App() {
 ```tsx
 const engine = useDrawingEngine(map, {
   initialFeatures: myFeatureCollection, // 初期 GeoJSON データ
-})
+  appearance: 'light',                  // 外観（既定: 'light'）
 ```
+
+## 外観テーマ
+
+コントロールの見た目を3つから選べます。
+
+| 値 | 内容 | アクセシビリティ |
+|---|---|---|
+| `light`（既定） | Geolonia デザインシステム準拠のフラット | WCAG AA 準拠 |
+| `dark` | 構造色の濃紺を面にしたダーク | WCAG AA 準拠 |
+| `glass` | 半透明とぼかしを使った意匠 | **AA を保証しません** |
+| `auto` | OS の設定に追従して `light` / `dark` を切り替える | WCAG AA 準拠 |
+
+```tsx
+const engine = useDrawingEngine(map, { appearance: 'dark' })
+```
+
+コンポーネントに直接渡すこともできます。
+
+```tsx
+<DrawControlPanel {...engine.controlPanelProps} appearance='dark' />
+```
+
+Vanilla JS 版は後から切り替えられます。
+
+```js
+const engine = new DrawingEngine(map, { appearance: 'dark' })
+engine.setAppearance('glass')
+```
+
+HTML から使う場合は `data-draw-appearance` 属性で指定します。
+
+```html
+<div class="geolonia" data-draw="on" data-draw-appearance="dark"></div>
+```
+
+外観はパネルのルート要素の `data-de-appearance` 属性として反映されます。`<html>` は変更しないため、同一ページに複数の地図を置いてそれぞれ別の外観にできます。
+
+### glass のアクセシビリティについて
+
+`glass` は半透明の面を地図タイルの上に重ねるため、**文字と背景のコントラストが地図の内容によって変わります。** 衛星写真や暗い地図スタイルの上では WCAG AA（4.5:1）を下回る可能性があります。
+
+行政向け案件など、アクセシビリティ要件がある場合は `light` または `dark` を使ってください。
+
+`backdrop-filter` に対応していない環境では、`glass` を指定しても `light` と同じ不透明な面で表示されます。
+
+### デザイントークン
+
+色・余白・角丸は [Geolonia デザインシステム](https://github.com/geolonia/geolonia-design-system)のトークンを参照します。`@geolonia/design-tokens` を読み込んでいる環境ではその値が使われ、読み込んでいない場合は既定値で動作します。
+
+```ts
+import '@geolonia/design-tokens/tokens.css'
+```
+
+デザインシステムのブランドテーマ（`<html data-theme="orange">`）と外観テーマは別の軸なので、組み合わせて使えます。ただしオレンジテーマは AA を保証しません（デザインシステム側の仕様）。
+
+各トークンの決定内容と根拠は [`docs/design-tokens.md`](docs/design-tokens.md) を参照してください。
 
 ## コンポーネント
 
 ### `DrawControlPanel`
 
-描画モード選択、Undo/Redo、削除、リセットなどの操作を提供するコントロールパネル。ドラッグで移動可能。パネル下部に Geolonia ブランドアイコンを表示。
+描画モード選択、Undo/Redo、削除、リセットなどの操作を提供するコントロールパネル。ドラッグで移動可能。パネル下部に Geolonia ブランドアイコンを表示。`appearance` で外観を指定できる。
 
 ### `DrawModeSelector`
 
@@ -186,6 +242,7 @@ try {
 ```typescript
 type DrawMode = 'point' | 'line' | 'polygon' | 'symbol'
 type PathMode = 'line' | 'polygon'
+type Appearance = 'light' | 'dark' | 'glass' | 'auto'
 
 type GeoloniaMapSettings = {
   container?: string

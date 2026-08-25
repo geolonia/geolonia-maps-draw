@@ -1,4 +1,4 @@
-import type { DrawMode } from '../../types'
+import type { Appearance, DrawMode } from '../../types'
 import { DrawModeSelectorElement } from './DrawModeSelectorElement'
 import {
   createGripIcon,
@@ -10,6 +10,7 @@ import {
   createGeoloniaIcon,
 } from './icons'
 import { clampPosition } from '../../lib/clamp-position'
+import { DEFAULT_APPEARANCE, resolveAppearance } from '../../lib/appearance'
 
 export type DrawControlPanelState = {
   drawMode: DrawMode | null
@@ -45,10 +46,11 @@ export class DrawControlPanelElement {
   private isDragging = false
   private dragOffset = { x: 0, y: 0 }
 
-  constructor(callbacks: DrawControlPanelCallbacks) {
+  constructor(callbacks: DrawControlPanelCallbacks, appearance: Appearance = DEFAULT_APPEARANCE) {
     this.callbacks = callbacks
     this.element = document.createElement('div')
     this.element.className = 'draw-control-panel'
+    this.element.setAttribute('data-de-appearance', resolveAppearance(appearance))
     this.element.style.left = `${this.position.x}px`
     this.element.style.top = `${this.position.y}px`
 
@@ -128,6 +130,10 @@ export class DrawControlPanelElement {
       : '選択した地物を削除'
     this.deleteBtn.title = deleteTitle
     this.deleteBtn.setAttribute('aria-label', deleteTitle)
+  }
+
+  setAppearance(appearance: Appearance): void {
+    this.element.setAttribute('data-de-appearance', resolveAppearance(appearance))
   }
 
   destroy(): void {

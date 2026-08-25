@@ -1,11 +1,12 @@
 import type maplibregl from 'maplibre-gl'
-import type { DrawMode, DrawingEngineOptions } from '../core/types'
+import type { Appearance, DrawMode, DrawingEngineOptions } from '../core/types'
 import { DrawingEngineCore } from '../core/DrawingEngineCore'
 import { DrawControlPanelElement } from './dom/DrawControlPanelElement'
 import { VertexContextMenuElement } from './dom/VertexContextMenuElement'
 import { RubberBandElement } from './dom/RubberBandElement'
 import { canDeleteVertex } from '../lib/vertex-helpers'
 import { assertGeolonia } from '../lib/assert-geolonia'
+import { DEFAULT_APPEARANCE, resolveAppearance } from '../lib/appearance'
 
 /**
  * Vanilla JS drawing engine — no React required.
@@ -31,11 +32,13 @@ export class DrawingEngine extends EventTarget {
   private controlsVisible = false
   private prevDrawMode: DrawMode | null = null
   private prevSelectedIds: Set<string> = new Set()
+  private currentAppearance: Appearance = DEFAULT_APPEARANCE
 
   constructor(map: maplibregl.Map, options?: DrawingEngineOptions) {
     super()
     assertGeolonia()
     this.map = map
+    this.currentAppearance = resolveAppearance(options?.appearance)
 
     this.core = new DrawingEngineCore(map, {
       initialFeatures: options?.initialFeatures,
@@ -64,6 +67,17 @@ export class DrawingEngine extends EventTarget {
     if (options?.showControls !== false) {
       this.showControls()
     }
+  }
+
+  // === Appearance ===
+
+  get appearance(): Appearance {
+    return this.currentAppearance
+  }
+
+  setAppearance(appearance: Appearance): void {
+    this.currentAppearance = resolveAppearance(appearance)
+    this.panel?.setAppearance(this.currentAppearance)
   }
 
   // === State getters (delegates to Core) ===
@@ -151,7 +165,7 @@ export class DrawingEngine extends EventTarget {
       onResetGeoJSON: () => this.core.resetGeoJSON(),
       onUndo: () => this.core.undo(),
       onRedo: () => this.core.redo(),
-    })
+    }, this.currentAppearance)
     this.map.getContainer().appendChild(this.panel.element)
     this.syncUI()
   }

@@ -1,7 +1,7 @@
 import type maplibregl from 'maplibre-gl'
-import type { DrawMode, PathMode } from '../types'
+import type { Appearance, DrawMode, PathMode } from '../types'
 
-export type { DrawMode, PathMode }
+export type { Appearance, DrawMode, PathMode }
 
 export type SelectedVertex = {
   featureId: string
@@ -60,6 +60,8 @@ export type DrawingEngineState = {
 export type DrawingEngineOptions = {
   initialFeatures?: GeoJSON.FeatureCollection
   showControls?: boolean
+  /** コントロールの外観。既定は 'light'。 */
+  appearance?: Appearance
 }
 
 /** Map instance type from Geolonia Embed */
