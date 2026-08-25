@@ -104,7 +104,7 @@ function highlightTsx(source: string): string {
   // Combined regex that matches tokens in priority order.
   // The first matching group wins, so earlier alternatives take precedence.
   const tokenRe =
-    /(\/\/[^\n]*)|(\/\*[\s\S]*?\*\/)|(`(?:[^`\\]|\\.)*`)|("(?:[^"\\]|\\.)*")|('(?:[^'\\]|\\.)*')|(<\/?[A-Z][\w.]*)|\b(\d+(?:\.\d+)?)\b|\b([a-zA-Z_$][\w$]*)\b/g
+    /(\/\/[^\n]*)|(\/\*[\s\S]*?\*\/)|(`(?:[^`\\]|\\.)*`)|("(?:[^"\\]|\\.)*")|('(?:[^'\\]|\\.)*')|(<\/?(?:[A-Za-z][\w.-]*|>))|\b(\d+(?:\.\d+)?)\b|\b([a-zA-Z_$][\w$]*)\b/g
 
   const parts: string[] = []
   let lastIndex = 0
