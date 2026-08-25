@@ -4,7 +4,7 @@
 
 ## 方針
 
-正本は [geolonia/geolonia-design-system](https://github.com/geolonia/geolonia-design-system) の `tokens.css`（npm: `@geolonia/design-tokens`）。このリポジトリは値を直書きせず、そこで定義されたトークンを参照する。
+正本は npm の [`@geolonia/design-tokens`](https://www.npmjs.com/package/@geolonia/design-tokens) が配布する `tokens.css`（実体: <https://unpkg.com/@geolonia/design-tokens@0.2.11/dist/tokens.css>）。このリポジトリは値を直書きせず、そこで定義されたトークンを参照する。
 
 このリポジトリは配布ライブラリなので、`tokens.css` を依存として読み込ませない。利用者アプリの `:root` に色を注入することになり、アプリ側のトークンと衝突するため。代わりに `--de-*` で一段ラップし、フォールバック付きで参照する。
 
@@ -161,14 +161,14 @@ MapLibre の `paint` は JavaScript の値として渡すため、CSS カスタ�
 
 デザインシステムに地図描画用のトークンは存在しない。グラフ系列色を流用する。`tokens.css` は「グラフの塗りは図形なので AA 4.5:1 は不要（3:1 目安）」と明記しており、地物の塗りも同じ性質のため根拠として使える。
 
-| 用途 | 現在 | 決定 | 由来 |
-|---|---|---|---|
-| 地物色1（既定） | `#1a73e8` | `#1E4FB8` | `--color-chart-1` |
-| 地物色2 | `#e86a4a` | `#E85A19` | `--color-chart-2` |
-| 地物色3 | — | `#1F7A3D` | `--color-chart-3` |
-| シンボルの既定色 | `#ffb400` | 地物色1に統一 | シンボルとポイントの区別は色ではなくアイコンで行う（#39） |
+| 用途 | 現在 | 決定 | 由来 | `src/lib/style-tokens.ts` の定数 |
+|---|---|---|---|---|
+| 地物色1（既定） | `#1a73e8` | `#1E4FB8` | `--color-chart-1` | `FEATURE_COLORS[0]` |
+| 地物色2 | `#e86a4a` | `#E85A19` | `--color-chart-2` | `FEATURE_COLORS[1]` |
+| 地物色3 | — | `#1F7A3D` | `--color-chart-3` | `FEATURE_COLORS[2]` |
+| シンボルの既定色 | `#ffb400` | 地物色1に統一 | シンボルとポイントの区別は色ではなくアイコンで行う（#39） | `DEFAULT_FEATURE_COLOR`（= `FEATURE_COLORS[0]`） |
 
-3色から増やす場合は `--color-chart-4` `#D98E00`、`--color-chart-5` `#1B2A4A` の順に足す。独自の色を発明しない。
+3色から増やす場合は `--color-chart-4` `#D98E00` を足す。`--color-chart-5` `#1B2A4A` は構造色の濃紺で、選択表示のアウトライン専用に確保しているため地物パレットには使わない。それでも足りない場合はデザインシステム側にトークンを追加する（6節）。独自の色を発明しない。
 
 ### 選択表示
 
@@ -206,7 +206,7 @@ MapLibre の `paint` は JavaScript の値として渡すため、CSS カスタ�
 
 デザインシステムに地図マーカー・ピンの規定は無い。このリポジトリで用意する。
 
-- 単色のピン。塗りは地物の色（`--de-feature-*` に相当する TS 定数）に追従する
+- 単色のピン。塗りは地物の色（`src/lib/style-tokens.ts` の `FEATURE_COLORS` / `DEFAULT_FEATURE_COLOR`）に追従する
 - `24 × 24`。アンカーは下端中央
 - アイコンを指定しなかった地物はこの既定ピンで描く
 
