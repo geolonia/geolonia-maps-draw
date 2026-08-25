@@ -35,6 +35,23 @@ describe('CodeViewer のシンタックスハイライト', () => {
     )
   })
 
+  it('アンダースコア・ドル始まりのコンポーネント名をタグとして扱う', () => {
+    const region = openWith('<_Private /><$Special />')
+    expect(tagTexts(region)).toEqual(expect.arrayContaining(['<_Private', '<$Special']))
+  })
+
+  it('名前空間付きのタグ名を最後まで含めて扱う', () => {
+    const region = openWith('<foo:bar></foo:bar>')
+    expect(tagTexts(region)).toEqual(
+      expect.arrayContaining(['<foo:bar', '</foo:bar']),
+    )
+  })
+
+  it('ドット記法のコンポーネント名をタグとして扱う', () => {
+    const region = openWith('<Map.Layer />')
+    expect(tagTexts(region)).toContain('<Map.Layer')
+  })
+
   it('コメント・文字列・数値のハイライトを壊さない', () => {
     const region = openWith('// note\nconst n = 1\nconst s = "x"')
     expect(region.querySelector('.hl-comment')?.textContent).toBe('// note')
