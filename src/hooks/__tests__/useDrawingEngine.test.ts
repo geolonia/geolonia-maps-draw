@@ -1631,4 +1631,79 @@ describe('useDrawingEngine', () => {
       expect(result.current.highlightedPanelFeatureId).toBeNull()
     })
   })
+
+  describe('pin marker image', () => {
+    const created: HTMLImageElement[] = []
+    const OriginalImage = globalThis.Image
+
+    beforeEach(() => {
+      created.length = 0
+      vi.stubGlobal(
+        'Image',
+        class extends OriginalImage {
+          constructor() {
+            super()
+            created.push(this as unknown as HTMLImageElement)
+          }
+        },
+      )
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    const lastImage = () => created[created.length - 1]
+
+    it('registers the pin image on the map once it finishes loading', () => {
+      renderHook(() => useDrawingEngine(getMap()))
+
+      act(() => {
+        lastImage().onload?.(new Event('load'))
+      })
+
+      expect(mockMap.addImage).toHaveBeenCalledWith(
+        'pin-marker',
+        expect.anything(),
+        { pixelRatio: 2 },
+      )
+    })
+
+    it('does not register the pin image twice', () => {
+      renderHook(() => useDrawingEngine(getMap()))
+      const img = lastImage()
+
+      act(() => {
+        img.onload?.(new Event('load'))
+        img.onload?.(new Event('load'))
+      })
+
+      expect(mockMap.addImage).toHaveBeenCalledTimes(1)
+    })
+
+    it('detaches the load handler on unmount', () => {
+      const { unmount } = renderHook(() => useDrawingEngine(getMap()))
+      const img = lastImage()
+
+      unmount()
+
+      expect(img.onload).toBeNull()
+    })
+
+    it('does not touch the map when the load fires after unmount', () => {
+      const { unmount } = renderHook(() => useDrawingEngine(getMap()))
+      const img = lastImage()
+      const handler = img.onload
+
+      unmount()
+      mockMap.addImage.mockClear()
+
+      // ハンドラ解除をすり抜けて発火したとしても、地図には触らない
+      act(() => {
+        handler?.call(img, new Event('load'))
+      })
+
+      expect(mockMap.addImage).not.toHaveBeenCalled()
+    })
+  })
 })

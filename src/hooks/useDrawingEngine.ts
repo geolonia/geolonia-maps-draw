@@ -182,9 +182,12 @@ export function useDrawingEngine(
       filter: ['all', ['==', ['geometry-type'], 'LineString']],
       paint: { 'line-color': '#e86a4a', 'line-width': 3 }
     })
-    // ピン画像を非同期ロード
+    // ピン画像を非同期ロード。
+    // ロード完了はアンマウント後にも起こりうるので、破棄済みなら地図に触らない。
+    let disposed = false
     const pinImg = new Image()
     pinImg.onload = () => {
+      if (disposed) return
       if (!map.hasImage('pin-marker')) {
         map.addImage('pin-marker', pinImg, { pixelRatio: 2 })
       }
@@ -258,6 +261,8 @@ export function useDrawingEngine(
     })
 
     return () => {
+      disposed = true
+      pinImg.onload = null
       ;[HIGHLIGHT_POINT_LAYER_ID, HIGHLIGHT_LINE_LAYER_ID, HIGHLIGHT_POLYGON_LAYER_ID,
         DRAFT_POINT_LAYER_ID, DRAFT_LINE_LAYER_ID, DRAFT_POLYGON_LAYER_ID,
         SYMBOL_LAYER_ID, POINT_LAYER_ID, LINE_LAYER_ID, POLYGON_LAYER_ID].forEach((layerId) => {
