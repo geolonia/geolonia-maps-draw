@@ -6,6 +6,10 @@ import {
 } from '@geolonia/drawing-engine'
 import '@geolonia/drawing-engine/style.css'
 
+import { CodeViewer } from './CodeViewer'
+import './CodeViewer.css'
+import appSource from './App.tsx?raw'
+
 export function App() {
   const { containerRef, map } = useGeoloniaMap({
     center: [139.767, 35.681],
@@ -46,6 +50,7 @@ export function App() {
             )}
           </>
         )}
+        <CodeViewer code={appSource} fileName="App.tsx" />
       </div>
     </div>
   )
