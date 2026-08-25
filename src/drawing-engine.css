@@ -1,4 +1,6 @@
 @layer drawing-engine {
+  /* 参照先の外部トークン名は @geolonia/design-tokens の名前と一致していない。
+     対応表と移行先は docs/design-tokens.md を参照する。 */
   :root {
     --de-gradient-primary: var(--gradient-primary, linear-gradient(135deg, #1a73e8 0%, #7c3aed 100%));
     --de-gradient-confirm: var(--gradient-confirm, linear-gradient(135deg, #1a73e8 0%, #6d28d9 50%, #7c3aed 100%));
