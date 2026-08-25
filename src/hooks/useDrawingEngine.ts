@@ -182,12 +182,29 @@ export function useDrawingEngine(
       filter: ['all', ['==', ['geometry-type'], 'LineString']],
       paint: { 'line-color': '#e86a4a', 'line-width': 3 }
     })
+    // ピン画像を非同期ロード。
+    // ロード完了はアンマウント後にも起こりうるので、破棄済みなら地図に触らない。
+    let disposed = false
+    const pinImg = new Image()
+    pinImg.onload = () => {
+      if (disposed) return
+      if (!map.hasImage('pin-marker')) {
+        map.addImage('pin-marker', pinImg, { pixelRatio: 2 })
+      }
+    }
+    pinImg.src = `${import.meta.env.BASE_URL}pin.png`
+
     map.addLayer({
       id: SYMBOL_LAYER_ID,
-      type: 'circle',
+      type: 'symbol',
       source: SOURCE_ID,
       filter: ['all', ['==', ['geometry-type'], 'Point'], ['==', ['get', 'drawMode'], 'symbol']],
-      paint: { 'circle-radius': 7, 'circle-color': '#ffb400', 'circle-stroke-color': '#fff', 'circle-stroke-width': 2 }
+      layout: {
+        'icon-image': 'pin-marker',
+        'icon-size': 0.4,
+        'icon-anchor': 'bottom',
+        'icon-allow-overlap': true,
+      }
     })
     map.addLayer({
       id: POINT_LAYER_ID,
@@ -244,6 +261,8 @@ export function useDrawingEngine(
     })
 
     return () => {
+      disposed = true
+      pinImg.onload = null
       ;[HIGHLIGHT_POINT_LAYER_ID, HIGHLIGHT_LINE_LAYER_ID, HIGHLIGHT_POLYGON_LAYER_ID,
         DRAFT_POINT_LAYER_ID, DRAFT_LINE_LAYER_ID, DRAFT_POLYGON_LAYER_ID,
         SYMBOL_LAYER_ID, POINT_LAYER_ID, LINE_LAYER_ID, POLYGON_LAYER_ID].forEach((layerId) => {
@@ -252,6 +271,7 @@ export function useDrawingEngine(
       for (const srcId of [HIGHLIGHT_SOURCE_ID, DRAFT_SOURCE_ID, SOURCE_ID]) {
         if (map.getSource(srcId)) map.removeSource(srcId)
       }
+      if (map.hasImage('pin-marker')) map.removeImage('pin-marker')
     }
   }, [map])
 
