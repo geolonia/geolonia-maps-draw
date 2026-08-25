@@ -1697,12 +1697,15 @@ describe('useDrawingEngine', () => {
 
       unmount()
       mockMap.addImage.mockClear()
+      // cleanup 自体も hasImage を呼ぶので、そこと区別するためクリアする
+      mockMap.hasImage.mockClear()
 
       // ハンドラ解除をすり抜けて発火したとしても、地図には触らない
       act(() => {
         handler?.call(img, new Event('load'))
       })
 
+      expect(mockMap.hasImage).not.toHaveBeenCalled()
       expect(mockMap.addImage).not.toHaveBeenCalled()
     })
   })
